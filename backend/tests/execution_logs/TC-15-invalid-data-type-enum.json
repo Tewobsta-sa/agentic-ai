@@ -1,0 +1,58 @@
+{
+  "request_id": "TC-15-invalid-data-type-enum",
+  "category": "missing_information",
+  "description": "data_type contains a value outside the allowed enum -> treated as invalid/incomplete input, request information rather than guessing which bucket it belongs to.",
+  "request": {
+    "vendor_name": "SafeCloud",
+    "product": "TeamDocs",
+    "cost": 5000,
+    "intended_use": "Store some files",
+    "data_type": "top_secret"
+  },
+  "expected_decision": "request_information",
+  "actual_decision": "request_information",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 1,
+  "final_rationale": "Request failed validation: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']",
+  "final_citations": [],
+  "guardrail_events": [],
+  "retry_counts": {},
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-15-invalid-data-type-enum (SafeCloud / TeamDocs)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Request has structurally invalid fields: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']"
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-15-invalid-data-type-enum",
+        "decision": "request_information"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-15-invalid-data-type-enum",
+        "decision": "request_information",
+        "rationale": "Request failed validation: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']",
+        "citations": [],
+        "recorded_at": "2026-08-12T10:36:47Z"
+      }
+    }
+  ]
+}

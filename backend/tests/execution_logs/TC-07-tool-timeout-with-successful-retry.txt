@@ -1,0 +1,19 @@
+REQUEST TC-07-tool-timeout-with-successful-retry  [tool_failures]
+Primary vendor-risk route times out; agent must retry via the backup route (a different, valid approach) and succeed.
+Input: {"vendor_name": "TimeoutLabs", "product": "MetricsHub", "cost": 7500, "intended_use": "Monitor internal system metrics", "data_type": "internal"}
+====================================================================================================
+THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-07-tool-timeout-with-successful-retry (TimeoutLabs / MetricsHub).
+THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
+  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "TimeoutLabs", "product": "MetricsHub", "route": "primary"}
+  OBSERVE step=1 tool=lookup_vendor_risk outcome=timeout -> {"outcome": "timeout", "route": "primary", "attempt": 1, "detail": "lookup_vendor_risk (primary) timed out on attempt 1."}
+THOUGHT: The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach).
+  ACTION  step=2 tool=lookup_vendor_risk attempt=2 route/variant=backup args={"vendor_name": "TimeoutLabs", "product": "MetricsHub", "route": "backup"}
+  OBSERVE step=2 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "backup", "attempt": 1, "source_id": "RISK-007", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "low", "assessment_date": "2026-07-22", "is_current": true, "days_since_assessment": 10}
+THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
+  ACTION  step=3 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-07-tool-timeout-with-successful-retry", "decision": "approve"}
+  OBSERVE step=3 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-07-tool-timeout-with-successful-retry", "decision": "approve", "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.", "citati
+====================================================================================================
+FINAL DECISION: approve  (expected: approve, PASS)
+STOP REASON: goal_complete
+RATIONALE: All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.
+CITATIONS: ['RISK-007', 'policy:approval']

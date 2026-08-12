@@ -1,0 +1,16 @@
+REQUEST TC-01-normal-approve  [normal]
+Clean approval path: low-risk vendor, current evidence, cost under ceiling, internal data.
+Input: {"vendor_name": "SafeCloud", "product": "TeamDocs", "cost": 8000, "intended_use": "Store internal team documents", "data_type": "internal"}
+====================================================================================================
+THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-01-normal-approve (SafeCloud / TeamDocs).
+THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
+  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "SafeCloud", "product": "TeamDocs", "route": "primary"}
+  OBSERVE step=1 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-001", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "low", "assessment_date": "2026-07-10", "is_current": true, "days_since_assessment": 22}
+THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
+  ACTION  step=2 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-01-normal-approve", "decision": "approve"}
+  OBSERVE step=2 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-01-normal-approve", "decision": "approve", "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.", "citations": ["RISK-001", "
+====================================================================================================
+FINAL DECISION: approve  (expected: approve, PASS)
+STOP REASON: goal_complete
+RATIONALE: All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.
+CITATIONS: ['RISK-001', 'policy:approval']

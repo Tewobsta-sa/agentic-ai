@@ -1,0 +1,103 @@
+{
+  "request_id": "TC-01-normal-approve",
+  "category": "normal",
+  "description": "Clean approval path: low-risk vendor, current evidence, cost under ceiling, internal data.",
+  "request": {
+    "vendor_name": "SafeCloud",
+    "product": "TeamDocs",
+    "cost": 8000,
+    "intended_use": "Store internal team documents",
+    "data_type": "internal"
+  },
+  "expected_decision": "approve",
+  "actual_decision": "approve",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 2,
+  "final_rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.",
+  "final_citations": [
+    "RISK-001",
+    "policy:approval"
+  ],
+  "guardrail_events": [],
+  "retry_counts": {
+    "lookup_vendor_risk::SafeCloud": 1,
+    "lookup_vendor_risk::SafeCloud::primary": 1
+  },
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-01-normal-approve (SafeCloud / TeamDocs)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Need the current vendor-risk record before I can evaluate status and risk rating."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "SafeCloud",
+        "product": "TeamDocs",
+        "route": "primary"
+      },
+      "attempt": 1,
+      "route_or_variant": "primary"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "outcome": "success",
+      "observation": {
+        "outcome": "success",
+        "route": "primary",
+        "attempt": 1,
+        "source_id": "RISK-001",
+        "source_type": "internal_vendor_risk_database",
+        "authority_tier": 2,
+        "status": "approved",
+        "risk_rating": "low",
+        "assessment_date": "2026-07-10",
+        "is_current": true,
+        "days_since_assessment": 22
+      }
+    },
+    {
+      "type": "thought",
+      "index": 2,
+      "text": "All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision."
+    },
+    {
+      "type": "action",
+      "step": 2,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-01-normal-approve",
+        "decision": "approve"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 2,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-01-normal-approve",
+        "decision": "approve",
+        "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.",
+        "citations": [
+          "RISK-001",
+          "policy:approval"
+        ],
+        "recorded_at": "2026-08-12T10:36:46Z"
+      }
+    }
+  ]
+}

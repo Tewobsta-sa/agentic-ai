@@ -1,0 +1,13 @@
+REQUEST TC-15-invalid-data-type-enum  [missing_information]
+data_type contains a value outside the allowed enum -> treated as invalid/incomplete input, request information rather than guessing which bucket it belongs to.
+Input: {"vendor_name": "SafeCloud", "product": "TeamDocs", "cost": 5000, "intended_use": "Store some files", "data_type": "top_secret"}
+====================================================================================================
+THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-15-invalid-data-type-enum (SafeCloud / TeamDocs).
+THOUGHT: Request has structurally invalid fields: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']
+  ACTION  step=1 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-15-invalid-data-type-enum", "decision": "request_information"}
+  OBSERVE step=1 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-15-invalid-data-type-enum", "decision": "request_information", "rationale": "Request failed validation: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']", "citations": [], "recorded_at": "2026-08-12T10:36:47Z"}
+====================================================================================================
+FINAL DECISION: request_information  (expected: request_information, PASS)
+STOP REASON: goal_complete
+RATIONALE: Request failed validation: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']
+CITATIONS: []

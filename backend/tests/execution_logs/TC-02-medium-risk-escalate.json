@@ -1,0 +1,101 @@
+{
+  "request_id": "TC-02-medium-risk-escalate",
+  "category": "normal",
+  "description": "Vendor has a current medium risk rating -> must escalate, not approve or reject.",
+  "request": {
+    "vendor_name": "DataBridge",
+    "product": "InsightPro",
+    "cost": 9000,
+    "intended_use": "Analyze internal operational metrics",
+    "data_type": "internal"
+  },
+  "expected_decision": "escalate",
+  "actual_decision": "escalate",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 2,
+  "final_rationale": "Current vendor risk rating is 'medium' (source RISK-002), which requires escalation rather than approval or rejection.",
+  "final_citations": [
+    "RISK-002"
+  ],
+  "guardrail_events": [],
+  "retry_counts": {
+    "lookup_vendor_risk::DataBridge": 1,
+    "lookup_vendor_risk::DataBridge::primary": 1
+  },
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-02-medium-risk-escalate (DataBridge / InsightPro)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Need the current vendor-risk record before I can evaluate status and risk rating."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "DataBridge",
+        "product": "InsightPro",
+        "route": "primary"
+      },
+      "attempt": 1,
+      "route_or_variant": "primary"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "outcome": "success",
+      "observation": {
+        "outcome": "success",
+        "route": "primary",
+        "attempt": 1,
+        "source_id": "RISK-002",
+        "source_type": "internal_vendor_risk_database",
+        "authority_tier": 2,
+        "status": "approved",
+        "risk_rating": "medium",
+        "assessment_date": "2026-06-20",
+        "is_current": true,
+        "days_since_assessment": 42
+      }
+    },
+    {
+      "type": "thought",
+      "index": 2,
+      "text": "All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision."
+    },
+    {
+      "type": "action",
+      "step": 2,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-02-medium-risk-escalate",
+        "decision": "escalate"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 2,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-02-medium-risk-escalate",
+        "decision": "escalate",
+        "rationale": "Current vendor risk rating is 'medium' (source RISK-002), which requires escalation rather than approval or rejection.",
+        "citations": [
+          "RISK-002"
+        ],
+        "recorded_at": "2026-08-12T10:36:46Z"
+      }
+    }
+  ]
+}

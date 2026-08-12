@@ -1,0 +1,101 @@
+{
+  "request_id": "TC-03-prohibited-vendor-reject",
+  "category": "normal",
+  "description": "Prohibited vendor/product -> hard reject regardless of cost or data type.",
+  "request": {
+    "vendor_name": "BlockedSoft",
+    "product": "SyncNow",
+    "cost": 5000,
+    "intended_use": "Synchronize company files",
+    "data_type": "internal"
+  },
+  "expected_decision": "reject",
+  "actual_decision": "reject",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 2,
+  "final_rationale": "Vendor/product is marked 'prohibited' in the internal vendor-risk database (source RISK-003).",
+  "final_citations": [
+    "RISK-003"
+  ],
+  "guardrail_events": [],
+  "retry_counts": {
+    "lookup_vendor_risk::BlockedSoft": 1,
+    "lookup_vendor_risk::BlockedSoft::primary": 1
+  },
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-03-prohibited-vendor-reject (BlockedSoft / SyncNow)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Need the current vendor-risk record before I can evaluate status and risk rating."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "BlockedSoft",
+        "product": "SyncNow",
+        "route": "primary"
+      },
+      "attempt": 1,
+      "route_or_variant": "primary"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "outcome": "success",
+      "observation": {
+        "outcome": "success",
+        "route": "primary",
+        "attempt": 1,
+        "source_id": "RISK-003",
+        "source_type": "internal_vendor_risk_database",
+        "authority_tier": 2,
+        "status": "prohibited",
+        "risk_rating": "high",
+        "assessment_date": "2026-07-12",
+        "is_current": true,
+        "days_since_assessment": 20
+      }
+    },
+    {
+      "type": "thought",
+      "index": 2,
+      "text": "All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision."
+    },
+    {
+      "type": "action",
+      "step": 2,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-03-prohibited-vendor-reject",
+        "decision": "reject"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 2,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-03-prohibited-vendor-reject",
+        "decision": "reject",
+        "rationale": "Vendor/product is marked 'prohibited' in the internal vendor-risk database (source RISK-003).",
+        "citations": [
+          "RISK-003"
+        ],
+        "recorded_at": "2026-08-12T10:36:46Z"
+      }
+    }
+  ]
+}

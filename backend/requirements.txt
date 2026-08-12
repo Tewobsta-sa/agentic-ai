@@ -1,0 +1,16 @@
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
+httpx<0.28
+python-dotenv==1.2.2
+
+# Optional: only needed if you want live LLM-driven reasoning.
+# The agent runs fully offline and deterministically without either of these
+# installed -- only install the one matching the provider you want to use.
+
+# Option A: Claude (Anthropic)
+anthropic==0.39.0
+
+# Option B: Gemini (Google) -- current unified SDK, NOT the older/deprecated
+# google-generativeai package.
+google-genai==2.17.0

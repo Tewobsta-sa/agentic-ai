@@ -1,0 +1,24 @@
+REQUEST TC-09-outdated-evidence-unrefreshable  [tool_failures]
+Vendor-risk record is stale (>180 days); agent retries document search with a corrected query but still finds nothing current -> escalate.
+Input: {"vendor_name": "OldStack", "product": "LegacyCRM", "cost": 4000, "intended_use": "Store internal sales records", "data_type": "internal"}
+====================================================================================================
+THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-09-outdated-evidence-unrefreshable (OldStack / LegacyCRM).
+THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
+  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "OldStack", "product": "LegacyCRM", "route": "primary"}
+  OBSERVE step=1 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-004", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "low", "assessment_date": "2025-10-01", "is_current": false, "days_since_assessment": 304}
+THOUGHT: Vendor-risk record is older than 180 days. Attempting to find a more current record via document search before escalating.
+  ACTION  step=2 tool=search_vendor_documents attempt=1 route/variant=default args={"vendor_name": "OldStack", "query_variant": "default"}
+  OBSERVE step=2 tool=search_vendor_documents outcome=no_results -> {"outcome": "no_results", "query_variant": "default", "attempt": 1, "documents": []}
+THOUGHT: Default-query document search found nothing newer. Retrying with a corrected query before giving up, per the retry policy.
+  ACTION  step=3 tool=search_vendor_documents attempt=2 route/variant=corrected args={"vendor_name": "OldStack", "query_variant": "corrected"}
+  OBSERVE step=3 tool=search_vendor_documents outcome=no_results -> {"outcome": "no_results", "query_variant": "corrected", "attempt": 1, "documents": []}
+THOUGHT: Default-query document search found nothing newer. Retrying with a corrected query before giving up, per the retry policy.
+  GUARDRAIL[repeated_route_rejected]: Planner tried route/variant 'corrected' for 'search_vendor_documents::OldStack' more than once; policy requires each retry to use a corrected query or a different approach.
+THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
+  ACTION  step=4 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-09-outdated-evidence-unrefreshable", "decision": "escalate"}
+  OBSERVE step=4 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-09-outdated-evidence-unrefreshable", "decision": "escalate", "rationale": "Vendor-risk record RISK-004 is outdated (older than 180 days) and no current replacement evidence could be found after retrying the document search.", "citations": ["policy:evidence_r
+====================================================================================================
+FINAL DECISION: escalate  (expected: escalate, PASS)
+STOP REASON: goal_complete
+RATIONALE: Vendor-risk record RISK-004 is outdated (older than 180 days) and no current replacement evidence could be found after retrying the document search.
+CITATIONS: ['policy:evidence_requirements']

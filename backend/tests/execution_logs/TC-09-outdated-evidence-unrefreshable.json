@@ -1,0 +1,179 @@
+{
+  "request_id": "TC-09-outdated-evidence-unrefreshable",
+  "category": "tool_failures",
+  "description": "Vendor-risk record is stale (>180 days); agent retries document search with a corrected query but still finds nothing current -> escalate.",
+  "request": {
+    "vendor_name": "OldStack",
+    "product": "LegacyCRM",
+    "cost": 4000,
+    "intended_use": "Store internal sales records",
+    "data_type": "internal"
+  },
+  "expected_decision": "escalate",
+  "actual_decision": "escalate",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 4,
+  "final_rationale": "Vendor-risk record RISK-004 is outdated (older than 180 days) and no current replacement evidence could be found after retrying the document search.",
+  "final_citations": [
+    "policy:evidence_requirements"
+  ],
+  "guardrail_events": [
+    {
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::OldStack' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 3,
+      "seq": 9
+    }
+  ],
+  "retry_counts": {
+    "lookup_vendor_risk::OldStack": 1,
+    "lookup_vendor_risk::OldStack::primary": 1,
+    "search_vendor_documents::OldStack": 3,
+    "search_vendor_documents::OldStack::default": 1,
+    "search_vendor_documents::OldStack::corrected": 2
+  },
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-09-outdated-evidence-unrefreshable (OldStack / LegacyCRM)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Need the current vendor-risk record before I can evaluate status and risk rating."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "OldStack",
+        "product": "LegacyCRM",
+        "route": "primary"
+      },
+      "attempt": 1,
+      "route_or_variant": "primary"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "outcome": "success",
+      "observation": {
+        "outcome": "success",
+        "route": "primary",
+        "attempt": 1,
+        "source_id": "RISK-004",
+        "source_type": "internal_vendor_risk_database",
+        "authority_tier": 2,
+        "status": "approved",
+        "risk_rating": "low",
+        "assessment_date": "2025-10-01",
+        "is_current": false,
+        "days_since_assessment": 304
+      }
+    },
+    {
+      "type": "thought",
+      "index": 2,
+      "text": "Vendor-risk record is older than 180 days. Attempting to find a more current record via document search before escalating."
+    },
+    {
+      "type": "action",
+      "step": 2,
+      "tool": "search_vendor_documents",
+      "args": {
+        "vendor_name": "OldStack",
+        "query_variant": "default"
+      },
+      "attempt": 1,
+      "route_or_variant": "default"
+    },
+    {
+      "type": "observation",
+      "step": 2,
+      "tool": "search_vendor_documents",
+      "outcome": "no_results",
+      "observation": {
+        "outcome": "no_results",
+        "query_variant": "default",
+        "attempt": 1,
+        "documents": []
+      }
+    },
+    {
+      "type": "thought",
+      "index": 3,
+      "text": "Default-query document search found nothing newer. Retrying with a corrected query before giving up, per the retry policy."
+    },
+    {
+      "type": "action",
+      "step": 3,
+      "tool": "search_vendor_documents",
+      "args": {
+        "vendor_name": "OldStack",
+        "query_variant": "corrected"
+      },
+      "attempt": 2,
+      "route_or_variant": "corrected"
+    },
+    {
+      "type": "observation",
+      "step": 3,
+      "tool": "search_vendor_documents",
+      "outcome": "no_results",
+      "observation": {
+        "outcome": "no_results",
+        "query_variant": "corrected",
+        "attempt": 1,
+        "documents": []
+      }
+    },
+    {
+      "type": "thought",
+      "index": 4,
+      "text": "Default-query document search found nothing newer. Retrying with a corrected query before giving up, per the retry policy."
+    },
+    {
+      "type": "guardrail",
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::OldStack' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 3,
+      "seq": 9
+    },
+    {
+      "type": "thought",
+      "index": 5,
+      "text": "All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision."
+    },
+    {
+      "type": "action",
+      "step": 4,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-09-outdated-evidence-unrefreshable",
+        "decision": "escalate"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 4,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-09-outdated-evidence-unrefreshable",
+        "decision": "escalate",
+        "rationale": "Vendor-risk record RISK-004 is outdated (older than 180 days) and no current replacement evidence could be found after retrying the document search.",
+        "citations": [
+          "policy:evidence_requirements"
+        ],
+        "recorded_at": "2026-08-12T10:36:46Z"
+      }
+    }
+  ]
+}

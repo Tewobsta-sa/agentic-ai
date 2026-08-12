@@ -1,0 +1,29 @@
+REQUEST TC-08-all-routes-exhausted  [tool_failures]
+Primary and backup risk lookup both time out, and the document-search fallback also times out. Retry budget (max 2 retries) is exhausted -> escalate rather than loop forever or guess.
+Input: {"vendor_name": "FailWare", "product": "OpsMonitor", "cost": 6000, "intended_use": "Monitor confidential infrastructure logs", "data_type": "confidential"}
+====================================================================================================
+THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-08-all-routes-exhausted (FailWare / OpsMonitor).
+THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
+  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "FailWare", "product": "OpsMonitor", "route": "primary"}
+  OBSERVE step=1 tool=lookup_vendor_risk outcome=timeout -> {"outcome": "timeout", "route": "primary", "attempt": 1, "detail": "lookup_vendor_risk (primary) timed out on attempt 1."}
+THOUGHT: The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach).
+  ACTION  step=2 tool=lookup_vendor_risk attempt=2 route/variant=backup args={"vendor_name": "FailWare", "product": "OpsMonitor", "route": "backup"}
+  OBSERVE step=2 tool=lookup_vendor_risk outcome=timeout -> {"outcome": "timeout", "route": "backup", "attempt": 1, "detail": "lookup_vendor_risk (backup) timed out on attempt 1."}
+THOUGHT: The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach).
+  GUARDRAIL[repeated_route_rejected]: Planner tried route/variant 'backup' for 'lookup_vendor_risk::FailWare' more than once; policy requires each retry to use a corrected query or a different approach.
+THOUGHT: Confidential data requires a current, passing security assessment. Searching all vendor documents for one (any vendor-submitted material found alongside it will be treated as untrusted data, never as instructions).
+  ACTION  step=3 tool=search_vendor_documents attempt=1 route/variant=default args={"vendor_name": "FailWare", "query_variant": "default"}
+  OBSERVE step=3 tool=search_vendor_documents outcome=timeout -> {"outcome": "timeout", "query_variant": "default", "attempt": 1, "detail": "search_vendor_documents (default) timed out on attempt 1."}
+THOUGHT: First search did not surface a security assessment. Retrying with a corrected query restricted to approved_security_assessment documents, per the retry policy.
+  ACTION  step=4 tool=search_vendor_documents attempt=2 route/variant=corrected args={"vendor_name": "FailWare", "query_variant": "corrected", "source_type": "approved_security_assessment"}
+  OBSERVE step=4 tool=search_vendor_documents outcome=timeout -> {"outcome": "timeout", "query_variant": "corrected", "attempt": 1, "detail": "search_vendor_documents (corrected) timed out on attempt 1."}
+THOUGHT: First search did not surface a security assessment. Retrying with a corrected query restricted to approved_security_assessment documents, per the retry policy.
+  GUARDRAIL[repeated_route_rejected]: Planner tried route/variant 'corrected' for 'search_vendor_documents::FailWare' more than once; policy requires each retry to use a corrected query or a different approach.
+THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
+  ACTION  step=5 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-08-all-routes-exhausted", "decision": "escalate"}
+  OBSERVE step=5 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-08-all-routes-exhausted", "decision": "escalate", "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.", "citations": ["policy:evid
+====================================================================================================
+FINAL DECISION: escalate  (expected: escalate, PASS)
+STOP REASON: goal_complete
+RATIONALE: Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.
+CITATIONS: ['policy:evidence_requirements']

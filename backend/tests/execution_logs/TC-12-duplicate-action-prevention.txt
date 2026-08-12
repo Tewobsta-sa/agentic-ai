@@ -1,0 +1,16 @@
+REQUEST TC-12-duplicate-action-prevention  [duplicate_action_prevention]
+Same request_id submitted twice. Second submission must return the existing recorded decision, not create a second log entry.
+Input: {"vendor_name": "DuplicateCo", "product": "FlowDesk", "cost": 6500, "intended_use": "Manage internal workflow tasks", "data_type": "internal"}
+====================================================================================================
+THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-12-duplicate-action-prevention (DuplicateCo / FlowDesk).
+THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
+  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "DuplicateCo", "product": "FlowDesk", "route": "primary"}
+  OBSERVE step=1 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-008", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "low", "assessment_date": "2026-07-25", "is_current": true, "days_since_assessment": 7}
+THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
+  ACTION  step=2 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-12-duplicate-action-prevention", "decision": "approve"}
+  OBSERVE step=2 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-12-duplicate-action-prevention", "decision": "approve", "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.", "citations": [
+====================================================================================================
+FINAL DECISION: approve  (expected: approve, PASS)
+STOP REASON: goal_complete
+RATIONALE: All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.
+CITATIONS: ['RISK-008', 'policy:approval']

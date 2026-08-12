@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ledger — Vendor Assessment Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1F4;
+    --paper-card:#FFFFFF;
+    --ink:#161B22;
+    --ink-soft:#4B5563;
+    --line:#D7DCE3;
+    --line-soft:#E6E9EE;
+    --accent:#8A5A2B;
+    --accent-soft:#F1E6D8;
+    --approve:#2E6B4F;
+    --approve-bg:#E4F0EA;
+    --reject:#9C3B3B;
+    --reject-bg:#F6E7E7;
+    --escalate:#A9791F;
+    --escalate-bg:#F7EFDC;
+    --info:#3B5B85;
+    --info-bg:#E8EEF6;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+    --radius: 3px;
+    --shadow: 0 1px 2px rgba(20,25,32,0.06), 0 1px 1px rgba(20,25,32,0.04);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:15px; line-height:1.5;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px);
+    background-size: 100% 32px;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--accent-soft);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  header.top{
+    position:sticky; top:0; z-index:20;
+    background:rgba(238,241,244,0.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{
+    max-width:1180px; margin:0 auto; padding:14px 24px;
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+  }
+  .brand{display:flex; align-items:baseline; gap:10px;}
+  .brand .mark{
+    font-family:var(--serif); font-weight:700; font-size:22px; letter-spacing:-0.01em;
+  }
+  .brand .sub{font-family:var(--mono); font-size:11px; color:var(--ink-soft); letter-spacing:0.06em; text-transform:uppercase;}
+  nav.tabs{display:flex; gap:2px; background:var(--paper-card); border:1px solid var(--line); border-radius:var(--radius); padding:2px;}
+  nav.tabs button{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.03em; text-transform:uppercase;
+    padding:7px 14px; border:none; background:transparent; color:var(--ink-soft); cursor:pointer; border-radius:2px;
+  }
+  nav.tabs button.active{background:var(--ink); color:#fff;}
+  .brain-pill{
+    font-family:var(--mono); font-size:11px; color:var(--ink-soft);
+    border:1px dashed var(--line); padding:4px 8px; border-radius:20px; display:flex; align-items:center; gap:6px;
+  }
+  .brain-pill .dot{width:6px;height:6px;border-radius:50%;background:#9AA4B2;}
+  .brain-pill.live .dot{background:var(--approve);}
+
+  main{max-width:1180px; margin:0 auto; padding:32px 24px 96px;}
+  .view{display:none;}
+  .view.active{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .hero{margin-bottom:28px;}
+  .hero .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent);}
+  .hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(28px,4vw,40px); margin:6px 0 8px; letter-spacing:-0.01em;}
+  .hero p{color:var(--ink-soft); max-width:60ch; margin:0;}
+
+  .grid{display:grid; grid-template-columns: 380px 1fr; gap:24px; align-items:start;}
+  @media (max-width:920px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+  }
+  .card > .card-head{
+    padding:14px 18px; border-bottom:1px solid var(--line-soft);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .card > .card-head h2{font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; margin:0; color:var(--ink-soft);}
+  .card-body{padding:18px;}
+
+  form .field{margin-bottom:14px;}
+  form label{display:block; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); margin-bottom:6px;}
+  form input, form select, form textarea{
+    width:100%; font-family:var(--sans); font-size:14px; padding:9px 10px;
+    border:1px solid var(--line); border-radius:2px; background:#fff; color:var(--ink);
+  }
+  form textarea{resize:vertical; min-height:56px;}
+  form input:focus, form select:focus, form textarea:focus{border-color:var(--accent);}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+
+  .scenario-picker{margin-bottom:18px; padding-bottom:16px; border-bottom:1px dashed var(--line);}
+  .scenario-picker select{margin-bottom:6px;}
+  .scenario-picker .hint{font-size:12px; color:var(--ink-soft);}
+
+  button.primary{
+    width:100%; padding:11px 16px; margin-top:6px;
+    background:var(--ink); color:#fff; border:none; border-radius:2px;
+    font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer;
+    transition:transform .12s ease, background .12s ease;
+  }
+  button.primary:hover{background:#000;}
+  button.primary:active{transform:scale(0.99);}
+  button.primary:disabled{opacity:0.5; cursor:progress;}
+  button.ghost{
+    background:transparent; border:1px solid var(--line); color:var(--ink);
+    padding:8px 14px; border-radius:2px; font-family:var(--mono); font-size:12px; cursor:pointer;
+  }
+  button.ghost:hover{border-color:var(--ink);}
+
+  /* Trace feed */
+  .trace-feed{padding:18px; min-height:340px;}
+  .empty-state{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:64px 24px; color:var(--ink-soft);
+  }
+  .empty-state .glyph{font-family:var(--serif); font-size:40px; color:var(--line); margin-bottom:10px;}
+  .trace-entry{
+    display:grid; grid-template-columns:88px 1fr; gap:14px; padding:10px 0;
+    border-bottom:1px solid var(--line-soft);
+    opacity:0; transform:translateY(4px); animation:reveal .3s ease forwards;
+  }
+  .trace-entry:last-child{border-bottom:none;}
+  @keyframes reveal{to{opacity:1; transform:none;}}
+  .trace-entry .kind{
+    font-family:var(--mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase;
+    padding-top:2px; color:var(--ink-soft);
+  }
+  .trace-entry.thought .kind{color:#6B5B95;}
+  .trace-entry.action .kind{color:var(--info);}
+  .trace-entry.observation .kind{color:#3E7A5C;}
+  .trace-entry.guardrail .kind{color:var(--accent);}
+  .trace-entry .body{font-size:13.5px;}
+  .trace-entry .body .tool-name{font-family:var(--mono); font-weight:600;}
+  .trace-entry .body .meta{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin-top:3px;}
+  .trace-entry.guardrail .body{background:var(--accent-soft); border-left:2px solid var(--accent); padding:8px 10px; border-radius:2px;}
+
+  .stamp-wrap{display:flex; justify-content:center; padding:28px 0 8px;}
+  .stamp{
+    font-family:var(--serif); font-weight:700; font-size:22px; letter-spacing:0.04em; text-transform:uppercase;
+    border:3px solid currentColor; border-radius:6px; padding:10px 22px;
+    transform:rotate(-4deg) scale(0.7); opacity:0;
+    animation:stampIn .45s cubic-bezier(.2,1.6,.4,1) forwards;
+    position:relative;
+  }
+  .stamp::after{
+    content:""; position:absolute; inset:-6px; border:1px solid currentColor; border-radius:8px; opacity:0.35;
+  }
+  @keyframes stampIn{ to{ transform:rotate(-4deg) scale(1); opacity:1; } }
+  .stamp.approve{color:var(--approve);}
+  .stamp.reject{color:var(--reject);}
+  .stamp.escalate{color:var(--escalate);}
+  .stamp.request_information{color:var(--info);}
+
+  .decision-panel{padding:0 18px 18px;}
+  .decision-panel .rationale{font-size:14px; margin:12px 0;}
+  .citations{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+  .citation-chip{
+    font-family:var(--mono); font-size:11px; background:var(--paper); border:1px solid var(--line);
+    padding:3px 8px; border-radius:12px; color:var(--ink-soft);
+  }
+
+  /* Test suite */
+  .suite-header{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
+  .rate-gauge{display:flex; align-items:baseline; gap:8px;}
+  .rate-gauge .num{font-family:var(--serif); font-size:40px; font-weight:600;}
+  .rate-gauge .num.pass{color:var(--approve);}
+  .rate-gauge .num.fail{color:var(--reject);}
+  table.results{width:100%; border-collapse:collapse; font-size:13px;}
+  table.results th{
+    text-align:left; font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--ink-soft); padding:8px 10px; border-bottom:1px solid var(--line);
+  }
+  table.results td{padding:9px 10px; border-bottom:1px solid var(--line-soft); vertical-align:top;}
+  table.results tr:hover{background:var(--paper);}
+  .badge{
+    font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:10px; display:inline-block;
+  }
+  .badge.approve{background:var(--approve-bg); color:var(--approve);}
+  .badge.reject{background:var(--reject-bg); color:var(--reject);}
+  .badge.escalate{background:var(--escalate-bg); color:var(--escalate);}
+  .badge.request_information{background:var(--info-bg); color:var(--info);}
+  .badge.pass{background:var(--approve-bg); color:var(--approve);}
+  .badge.fail{background:var(--reject-bg); color:var(--reject);}
+  .cat-tag{font-family:var(--mono); font-size:10.5px; color:var(--ink-soft);}
+
+  .category-bars{display:flex; flex-direction:column; gap:8px; margin:16px 0 22px;}
+  .cbar-row{display:grid; grid-template-columns:170px 1fr 46px; align-items:center; gap:10px;}
+  .cbar-row .label{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);}
+  .cbar-track{height:8px; background:var(--line-soft); border-radius:4px; overflow:hidden;}
+  .cbar-fill{height:100%; background:var(--approve);}
+  .cbar-row .frac{font-family:var(--mono); font-size:11px; color:var(--ink-soft); text-align:right;}
+
+  /* Policy view */
+  .policy-doc{
+    font-family:var(--mono); font-size:13px; white-space:pre-wrap; line-height:1.7;
+    background:var(--paper-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px 28px; box-shadow:var(--shadow);
+  }
+
+  footer{max-width:1180px; margin:0 auto; padding:24px; color:var(--ink-soft); font-size:12px; font-family:var(--mono);}
+
+  .toast{
+    position:fixed; bottom:20px; right:20px; background:var(--ink); color:#fff; padding:10px 16px;
+    border-radius:2px; font-size:13px; box-shadow:var(--shadow); opacity:0; transform:translateY(8px);
+    transition:all .25s ease; pointer-events:none; z-index:50;
+  }
+  .toast.show{opacity:1; transform:none;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <span class="mark">Ledger</span>
+      <span class="sub">Vendor Assessment Agent</span>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-view="assess" class="active">Assess</button>
+      <button data-view="suite">Test Suite</button>
+      <button data-view="policy">Policy</button>
+    </nav>
+    <span class="brain-pill" id="brainPill"><span class="dot"></span><span id="brainLabel">checking…</span></span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ASSESS VIEW -->
+  <section class="view active" id="view-assess">
+    <div class="hero">
+      <div class="eyebrow">01 — Submit for review</div>
+      <h1>Reason, act, observe, decide.</h1>
+      <p>Submit a vendor request and watch the agent's ReAct loop work in real time: it calls tools, validates what comes back, cites its evidence, and stops the moment policy gives it a clear answer — or the moment it doesn't.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><h2>Request</h2></div>
+        <div class="card-body">
+          <div class="scenario-picker">
+            <label for="scenarioSelect">Load a scenario</label>
+            <select id="scenarioSelect">
+              <option value="">— choose a test case —</option>
+            </select>
+            <div class="hint">Or fill in the fields below by hand.</div>
+          </div>
+          <form id="assessForm">
+            <div class="field">
+              <label for="vendor_name">Vendor name</label>
+              <input id="vendor_name" name="vendor_name" placeholder="e.g. SafeCloud" required>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="product">Product</label>
+                <input id="product" name="product" placeholder="e.g. TeamDocs" required>
+              </div>
+              <div class="field">
+                <label for="cost">Cost (USD)</label>
+                <input id="cost" name="cost" type="number" min="0" placeholder="8000" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="intended_use">Intended use</label>
+              <textarea id="intended_use" name="intended_use" placeholder="Store internal team documents"></textarea>
+            </div>
+            <div class="field">
+              <label for="data_type">Data type</label>
+              <select id="data_type" name="data_type" required>
+                <option value="">select…</option>
+                <option value="public">public</option>
+                <option value="internal">internal</option>
+                <option value="confidential">confidential</option>
+                <option value="restricted">restricted</option>
+              </select>
+            </div>
+            <button type="submit" class="primary" id="submitBtn">Run assessment</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Execution trace</h2>
+          <span class="cat-tag" id="stepCounter"></span>
+        </div>
+        <div class="trace-feed" id="traceFeed">
+          <div class="empty-state">
+            <div class="glyph">§</div>
+            <div>No assessment running yet.<br>Load a scenario or submit a request to begin.</div>
+          </div>
+        </div>
+        <div id="decisionPanel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEST SUITE VIEW -->
+  <section class="view" id="view-suite">
+    <div class="hero">
+      <div class="eyebrow">02 — Verification</div>
+      <h1>The full test suite, on demand.</h1>
+      <p>Fifteen curated cases exercise every required failure mode: missing fields, tool timeouts with retries, stale evidence, conflicting sources, prompt injection, and duplicate submissions.</p>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2>Results</h2>
+        <button class="ghost" id="runSuiteBtn">Run full suite</button>
+      </div>
+      <div class="card-body">
+        <div id="suiteEmpty" class="empty-state" style="padding:40px 24px;">
+          <div class="glyph">✓</div>
+          <div>Click "Run full suite" to execute all 15 cases against the live agent.</div>
+        </div>
+        <div id="suiteResults" style="display:none;">
+          <div class="suite-header">
+            <div class="rate-gauge">
+              <span class="num pass" id="passRate">–</span>
+              <span class="cat-tag" id="passRateLabel">passed</span>
+            </div>
+          </div>
+          <div class="category-bars" id="categoryBars"></div>
+          <table class="results">
+            <thead>
+              <tr><th>Case</th><th>Category</th><th>Expected</th><th>Actual</th><th>Steps</th><th>Result</th></tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POLICY VIEW -->
+  <section class="view" id="view-policy">
+    <div class="hero">
+      <div class="eyebrow">03 — Source of truth</div>
+      <h1>The policy the agent is bound to.</h1>
+      <p>Every decision is validated against this document before it is ever recorded — the model proposes, the policy engine decides.</p>
+    </div>
+    <div class="policy-doc" id="policyDoc">Loading policy…</div>
+  </section>
+
+</main>
+
+<footer>LEDGER — hybrid LLM-planner + deterministic policy guardrail · request_id-idempotent · retry-bounded</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE = window.LEDGER_API_BASE || "http://localhost:8000";
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+// --- Tabs ---
+document.getElementById('tabs').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-view]');
+  if(!btn) return;
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  if(btn.dataset.view === 'policy') loadPolicy();
+});
+
+// --- Brain info ---
+async function loadBrainInfo(){
+  try{
+    const res = await fetch(`${API_BASE}/api/brain-info`);
+    const data = await res.json();
+    document.getElementById('brainLabel').textContent = data.mode;
+    document.getElementById('brainPill').classList.toggle('live', data.mode.startsWith('llm'));
+  }catch(e){
+    document.getElementById('brainLabel').textContent = 'backend offline';
+  }
+}
+
+// --- Scenario picker ---
+let TEST_CASES = [];
+async function loadScenarios(){
+  try{
+    const res = await fetch(`${API_BASE}/api/test-cases`);
+    const data = await res.json();
+    TEST_CASES = data.test_cases;
+    const sel = document.getElementById('scenarioSelect');
+    TEST_CASES.forEach((c, i)=>{
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${c.request_id} — ${c.description.slice(0,60)}${c.description.length>60?'…':''}`;
+      sel.appendChild(opt);
+    });
+  }catch(e){ /* backend not running yet */ }
+}
+document.getElementById('scenarioSelect').addEventListener('change', (e)=>{
+  const idx = e.target.value;
+  if(idx === '') return;
+  const c = TEST_CASES[idx];
+  const r = c.request;
+  document.getElementById('vendor_name').value = r.vendor_name || '';
+  document.getElementById('product').value = r.product || '';
+  document.getElementById('cost').value = r.cost ?? '';
+  document.getElementById('intended_use').value = r.intended_use || '';
+  document.getElementById('data_type').value = r.data_type || '';
+});
+
+// --- Trace rendering ---
+function kindLabel(entry){
+  if(entry.type==='thought') return 'Thought';
+  if(entry.type==='action') return 'Action';
+  if(entry.type==='observation') return 'Observe';
+  if(entry.type==='guardrail') return 'Guardrail';
+  return entry.type;
+}
+function renderTraceEntry(entry, delayMs){
+  const div = document.createElement('div');
+  div.className = `trace-entry ${entry.type}`;
+  div.style.animationDelay = delayMs + 'ms';
+  const kind = document.createElement('div');
+  kind.className = 'kind';
+  kind.textContent = kindLabel(entry);
+  const body = document.createElement('div');
+  body.className = 'body';
+
+  if(entry.type === 'thought'){
+    body.textContent = entry.text;
+  } else if(entry.type === 'action'){
+    body.innerHTML = `<span class="tool-name">${entry.tool}</span>(${Object.entries(entry.args||{}).map(([k,v])=>`${k}=${JSON.stringify(v)}`).join(', ')})`
+      + `<div class="meta">attempt ${entry.attempt} · route/variant: ${entry.route_or_variant}</div>`;
+  } else if(entry.type === 'observation'){
+    const outcome = entry.outcome;
+    let summary = outcome;
+    if(entry.observation && typeof entry.observation === 'object'){
+      const o = entry.observation;
+      if(o.risk_rating) summary += ` — risk: ${o.risk_rating}, current: ${o.is_current}`;
+      else if(o.documents) summary += ` — ${o.documents.length} document(s)`;
+      else if(o.result) summary += ` — result: ${o.result}`;
+    }
+    body.innerHTML = `<span class="tool-name">${entry.tool}</span> → ${summary}`;
+  } else if(entry.type === 'guardrail'){
+    body.innerHTML = `<strong>${entry.kind.replace(/_/g,' ')}</strong><br>${entry.detail}`;
+  }
+  div.appendChild(kind); div.appendChild(body);
+  return div;
+}
+
+async function playTrace(trace){
+  const feed = document.getElementById('traceFeed');
+  feed.innerHTML = '';
+  trace.forEach((entry, i)=>{
+    feed.appendChild(renderTraceEntry(entry, i*55));
+  });
+}
+
+function renderDecision(result){
+  const panel = document.getElementById('decisionPanel');
+  const stampClass = result.decision;
+  const stampText = {approve:'Approved', reject:'Rejected', escalate:'Escalated', request_information:'Info needed'}[result.decision] || result.decision;
+  panel.innerHTML = `
+    <div class="stamp-wrap"><div class="stamp ${stampClass}">${stampText}</div></div>
+    <div class="decision-panel">
+      <div class="rationale">${result.rationale}</div>
+      <div class="citations">${(result.citations||[]).map(c=>`<span class="citation-chip">${c}</span>`).join('')}</div>
+    </div>`;
+}
+
+document.getElementById('assessForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Running…';
+  document.getElementById('decisionPanel').innerHTML = '';
+  document.getElementById('traceFeed').innerHTML = '<div class="empty-state"><div class="glyph">…</div><div>Agent is reasoning…</div></div>';
+
+  const payload = {
+    vendor_name: document.getElementById('vendor_name').value || null,
+    product: document.getElementById('product').value || null,
+    cost: document.getElementById('cost').value ? Number(document.getElementById('cost').value) : null,
+    intended_use: document.getElementById('intended_use').value || null,
+    data_type: document.getElementById('data_type').value || null,
+  };
+
+  try{
+    const res = await fetch(`${API_BASE}/api/assess`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('Request failed');
+    const data = await res.json();
+    document.getElementById('stepCounter').textContent = `${data.steps_taken} step(s) · ${data.request_id}`;
+    await playTrace(data.trace);
+    setTimeout(()=>renderDecision(data), data.trace.length*55 + 150);
+  }catch(err){
+    toast('Could not reach the backend at ' + API_BASE);
+    document.getElementById('traceFeed').innerHTML = `<div class="empty-state"><div class="glyph">!</div><div>Could not reach the backend.<br>Is it running at ${API_BASE}?</div></div>`;
+  }finally{
+    btn.disabled = false; btn.textContent = 'Run assessment';
+  }
+});
+
+// --- Test suite ---
+document.getElementById('runSuiteBtn').addEventListener('click', async ()=>{
+  const btn = document.getElementById('runSuiteBtn');
+  btn.disabled = true; btn.textContent = 'Running…';
+  try{
+    const res = await fetch(`${API_BASE}/api/run-tests`, {method:'POST'});
+    const data = await res.json();
+    document.getElementById('suiteEmpty').style.display = 'none';
+    document.getElementById('suiteResults').style.display = 'block';
+
+    document.getElementById('passRate').textContent = `${data.passed}/${data.total}`;
+    document.getElementById('passRateLabel').textContent = `${(data.success_rate*100).toFixed(1)}% success rate`;
+
+    const cats = {};
+    data.results.forEach(r=>{
+      cats[r.category] = cats[r.category] || {pass:0,total:0};
+      cats[r.category].total++;
+      if(r.pass) cats[r.category].pass++;
+    });
+    const barsEl = document.getElementById('categoryBars');
+    barsEl.innerHTML = '';
+    Object.entries(cats).forEach(([cat, s])=>{
+      const row = document.createElement('div');
+      row.className = 'cbar-row';
+      const pct = Math.round(100*s.pass/s.total);
+      row.innerHTML = `<div class="label">${cat.replace(/_/g,' ')}</div>
+        <div class="cbar-track"><div class="cbar-fill" style="width:${pct}%; background:${pct===100?'var(--approve)':'var(--escalate)'}"></div></div>
+        <div class="frac">${s.pass}/${s.total}</div>`;
+      barsEl.appendChild(row);
+    });
+
+    const tbody = document.getElementById('resultsBody');
+    tbody.innerHTML = '';
+    data.results.forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${r.request_id}</strong><br><span class="cat-tag">${r.description||''}</span></td>
+        <td><span class="cat-tag">${r.category}</span></td>
+        <td><span class="badge ${r.expected_decision}">${r.expected_decision}</span></td>
+        <td><span class="badge ${r.actual_decision}">${r.actual_decision}</span></td>
+        <td>${r.steps_taken}</td>
+        <td><span class="badge ${r.pass?'pass':'fail'}">${r.pass?'PASS':'FAIL'}</span></td>`;
+      tbody.appendChild(tr);
+    });
+    toast(`Suite complete: ${data.passed}/${data.total} passed`);
+  }catch(err){
+    toast('Could not reach the backend at ' + API_BASE);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Run full suite';
+  }
+});
+
+// --- Policy view ---
+let policyLoaded = false;
+async function loadPolicy(){
+  if(policyLoaded) return;
+  try{
+    const res = await fetch(`${API_BASE}/api/policy`);
+    const data = await res.json();
+    document.getElementById('policyDoc').textContent = data.content;
+    policyLoaded = true;
+  }catch(e){
+    document.getElementById('policyDoc').textContent = 'Could not reach the backend at ' + API_BASE;
+  }
+}
+
+loadBrainInfo();
+loadScenarios();
+</script>
+</body>
+</html>

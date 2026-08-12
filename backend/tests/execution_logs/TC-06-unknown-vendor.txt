@@ -1,0 +1,21 @@
+REQUEST TC-06-unknown-vendor  [missing_information]
+Vendor not present in any internal system at all -> risk lookup returns not_found, no evidence obtainable -> escalate for manual review rather than guessing.
+Input: {"vendor_name": "GhostVendor", "product": "Mystery Tool", "cost": 3000, "intended_use": "Trial a new tool", "data_type": "internal"}
+====================================================================================================
+THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-06-unknown-vendor (GhostVendor / Mystery Tool).
+THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
+  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "GhostVendor", "product": "Mystery Tool", "route": "primary"}
+  OBSERVE step=1 tool=lookup_vendor_risk outcome=not_found -> {"outcome": "not_found", "route": "primary", "attempt": 1, "vendor_name": "GhostVendor"}
+THOUGHT: The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach).
+  ACTION  step=2 tool=lookup_vendor_risk attempt=2 route/variant=backup args={"vendor_name": "GhostVendor", "product": "Mystery Tool", "route": "backup"}
+  OBSERVE step=2 tool=lookup_vendor_risk outcome=not_found -> {"outcome": "not_found", "route": "backup", "attempt": 1, "vendor_name": "GhostVendor"}
+THOUGHT: The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach).
+  GUARDRAIL[repeated_route_rejected]: Planner tried route/variant 'backup' for 'lookup_vendor_risk::GhostVendor' more than once; policy requires each retry to use a corrected query or a different approach.
+THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
+  ACTION  step=3 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-06-unknown-vendor", "decision": "escalate"}
+  OBSERVE step=3 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-06-unknown-vendor", "decision": "escalate", "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.", "citations": ["policy:evidence_r
+====================================================================================================
+FINAL DECISION: escalate  (expected: escalate, PASS)
+STOP REASON: goal_complete
+RATIONALE: Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.
+CITATIONS: ['policy:evidence_requirements']

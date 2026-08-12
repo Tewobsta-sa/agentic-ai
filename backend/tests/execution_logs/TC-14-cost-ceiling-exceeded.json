@@ -1,0 +1,62 @@
+{
+  "request_id": "TC-14-cost-ceiling-exceeded",
+  "category": "normal",
+  "description": "Cost exceeds the USD 10,000 ceiling -> escalate regardless of otherwise-clean risk profile.",
+  "request": {
+    "vendor_name": "BudgetSoft",
+    "product": "NotesPlus",
+    "cost": 15000,
+    "intended_use": "Create internal meeting notes",
+    "data_type": "internal"
+  },
+  "expected_decision": "escalate",
+  "actual_decision": "escalate",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 1,
+  "final_rationale": "Cost 15000 exceeds the USD 10000 approval ceiling.",
+  "final_citations": [
+    "policy:cost"
+  ],
+  "guardrail_events": [],
+  "retry_counts": {},
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-14-cost-ceiling-exceeded (BudgetSoft / NotesPlus)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Cost 15000 exceeds the 10000 ceiling. Escalating without needing further risk evidence."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-14-cost-ceiling-exceeded",
+        "decision": "escalate"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-14-cost-ceiling-exceeded",
+        "decision": "escalate",
+        "rationale": "Cost 15000 exceeds the USD 10000 approval ceiling.",
+        "citations": [
+          "policy:cost"
+        ],
+        "recorded_at": "2026-08-12T10:36:47Z"
+      }
+    }
+  ]
+}

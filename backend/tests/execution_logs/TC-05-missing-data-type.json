@@ -1,0 +1,58 @@
+{
+  "request_id": "TC-05-missing-data-type",
+  "category": "missing_information",
+  "description": "Required field 'data_type' is missing -> must request information.",
+  "request": {
+    "vendor_name": "SafeCloud",
+    "product": "TeamDocs",
+    "cost": 7000,
+    "intended_use": "Store project documents",
+    "data_type": null
+  },
+  "expected_decision": "request_information",
+  "actual_decision": "request_information",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 1,
+  "final_rationale": "Required field(s) missing: data_type.",
+  "final_citations": [],
+  "guardrail_events": [],
+  "retry_counts": {},
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-05-missing-data-type (SafeCloud / TeamDocs)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Required field(s) missing from the request: data_type. No tool call can substitute for missing required information."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-05-missing-data-type",
+        "decision": "request_information"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-05-missing-data-type",
+        "decision": "request_information",
+        "rationale": "Required field(s) missing: data_type.",
+        "citations": [],
+        "recorded_at": "2026-08-12T10:36:46Z"
+      }
+    }
+  ]
+}

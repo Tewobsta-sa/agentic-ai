@@ -1,0 +1,23 @@
+[
+  {
+    "request_id": "WEB-0001-35315",
+    "decision": "approve",
+    "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.",
+    "citations": [
+      "RISK-001",
+      "policy:approval"
+    ],
+    "recorded_at": "2026-08-12T11:55:32Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "WEB-0002-35853",
+    "decision": "reject",
+    "rationale": "Vendor/product is marked 'prohibited' in the internal vendor-risk database (source RISK-003).",
+    "citations": [
+      "RISK-003"
+    ],
+    "recorded_at": "2026-08-12T12:07:49Z",
+    "outcome": "recorded"
+  }
+]

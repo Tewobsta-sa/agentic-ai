@@ -1,0 +1,221 @@
+{
+  "request_id": "TC-08-all-routes-exhausted",
+  "category": "tool_failures",
+  "description": "Primary and backup risk lookup both time out, and the document-search fallback also times out. Retry budget (max 2 retries) is exhausted -> escalate rather than loop forever or guess.",
+  "request": {
+    "vendor_name": "FailWare",
+    "product": "OpsMonitor",
+    "cost": 6000,
+    "intended_use": "Monitor confidential infrastructure logs",
+    "data_type": "confidential"
+  },
+  "expected_decision": "escalate",
+  "actual_decision": "escalate",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 5,
+  "final_rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.",
+  "final_citations": [
+    "policy:evidence_requirements"
+  ],
+  "guardrail_events": [
+    {
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'backup' for 'lookup_vendor_risk::FailWare' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 2,
+      "seq": 7
+    },
+    {
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::FailWare' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 4,
+      "seq": 13
+    }
+  ],
+  "retry_counts": {
+    "lookup_vendor_risk::FailWare": 3,
+    "lookup_vendor_risk::FailWare::primary": 1,
+    "lookup_vendor_risk::FailWare::backup": 2,
+    "search_vendor_documents::FailWare": 3,
+    "search_vendor_documents::FailWare::default": 1,
+    "search_vendor_documents::FailWare::corrected": 2
+  },
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-08-all-routes-exhausted (FailWare / OpsMonitor)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Need the current vendor-risk record before I can evaluate status and risk rating."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "FailWare",
+        "product": "OpsMonitor",
+        "route": "primary"
+      },
+      "attempt": 1,
+      "route_or_variant": "primary"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "outcome": "timeout",
+      "observation": {
+        "outcome": "timeout",
+        "route": "primary",
+        "attempt": 1,
+        "detail": "lookup_vendor_risk (primary) timed out on attempt 1."
+      }
+    },
+    {
+      "type": "thought",
+      "index": 2,
+      "text": "The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach)."
+    },
+    {
+      "type": "action",
+      "step": 2,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "FailWare",
+        "product": "OpsMonitor",
+        "route": "backup"
+      },
+      "attempt": 2,
+      "route_or_variant": "backup"
+    },
+    {
+      "type": "observation",
+      "step": 2,
+      "tool": "lookup_vendor_risk",
+      "outcome": "timeout",
+      "observation": {
+        "outcome": "timeout",
+        "route": "backup",
+        "attempt": 1,
+        "detail": "lookup_vendor_risk (backup) timed out on attempt 1."
+      }
+    },
+    {
+      "type": "thought",
+      "index": 3,
+      "text": "The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach)."
+    },
+    {
+      "type": "guardrail",
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'backup' for 'lookup_vendor_risk::FailWare' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 2,
+      "seq": 7
+    },
+    {
+      "type": "thought",
+      "index": 4,
+      "text": "Confidential data requires a current, passing security assessment. Searching all vendor documents for one (any vendor-submitted material found alongside it will be treated as untrusted data, never as instructions)."
+    },
+    {
+      "type": "action",
+      "step": 3,
+      "tool": "search_vendor_documents",
+      "args": {
+        "vendor_name": "FailWare",
+        "query_variant": "default"
+      },
+      "attempt": 1,
+      "route_or_variant": "default"
+    },
+    {
+      "type": "observation",
+      "step": 3,
+      "tool": "search_vendor_documents",
+      "outcome": "timeout",
+      "observation": {
+        "outcome": "timeout",
+        "query_variant": "default",
+        "attempt": 1,
+        "detail": "search_vendor_documents (default) timed out on attempt 1."
+      }
+    },
+    {
+      "type": "thought",
+      "index": 5,
+      "text": "First search did not surface a security assessment. Retrying with a corrected query restricted to approved_security_assessment documents, per the retry policy."
+    },
+    {
+      "type": "action",
+      "step": 4,
+      "tool": "search_vendor_documents",
+      "args": {
+        "vendor_name": "FailWare",
+        "query_variant": "corrected",
+        "source_type": "approved_security_assessment"
+      },
+      "attempt": 2,
+      "route_or_variant": "corrected"
+    },
+    {
+      "type": "observation",
+      "step": 4,
+      "tool": "search_vendor_documents",
+      "outcome": "timeout",
+      "observation": {
+        "outcome": "timeout",
+        "query_variant": "corrected",
+        "attempt": 1,
+        "detail": "search_vendor_documents (corrected) timed out on attempt 1."
+      }
+    },
+    {
+      "type": "thought",
+      "index": 6,
+      "text": "First search did not surface a security assessment. Retrying with a corrected query restricted to approved_security_assessment documents, per the retry policy."
+    },
+    {
+      "type": "guardrail",
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::FailWare' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 4,
+      "seq": 13
+    },
+    {
+      "type": "thought",
+      "index": 7,
+      "text": "All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision."
+    },
+    {
+      "type": "action",
+      "step": 5,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-08-all-routes-exhausted",
+        "decision": "escalate"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 5,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-08-all-routes-exhausted",
+        "decision": "escalate",
+        "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.",
+        "citations": [
+          "policy:evidence_requirements"
+        ],
+        "recorded_at": "2026-08-12T10:36:46Z"
+      }
+    }
+  ]
+}

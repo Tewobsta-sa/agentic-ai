@@ -1,0 +1,145 @@
+{
+  "request_id": "TC-10-conflicting-tier2-sources",
+  "category": "conflicting_evidence",
+  "description": "Internal vendor-risk DB says 'low', a same-tier approved security assessment says 'high' -> equal-authority conflict must be escalated, not resolved unilaterally.",
+  "request": {
+    "vendor_name": "SplitWare",
+    "product": "SecureShare",
+    "cost": 7000,
+    "intended_use": "Share confidential project files",
+    "data_type": "confidential"
+  },
+  "expected_decision": "escalate",
+  "actual_decision": "escalate",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 3,
+  "final_rationale": "Two current, equally authoritative (tier 2) sources disagree on a material fact (risk rating). Per policy, conflicting same-priority evidence must be escalated rather than resolved unilaterally.",
+  "final_citations": [
+    "policy:source_priority"
+  ],
+  "guardrail_events": [],
+  "retry_counts": {
+    "lookup_vendor_risk::SplitWare": 1,
+    "lookup_vendor_risk::SplitWare::primary": 1,
+    "search_vendor_documents::SplitWare": 1,
+    "search_vendor_documents::SplitWare::default": 1
+  },
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-10-conflicting-tier2-sources (SplitWare / SecureShare)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Need the current vendor-risk record before I can evaluate status and risk rating."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "SplitWare",
+        "product": "SecureShare",
+        "route": "primary"
+      },
+      "attempt": 1,
+      "route_or_variant": "primary"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "outcome": "success",
+      "observation": {
+        "outcome": "success",
+        "route": "primary",
+        "attempt": 1,
+        "source_id": "RISK-005",
+        "source_type": "internal_vendor_risk_database",
+        "authority_tier": 2,
+        "status": "approved",
+        "risk_rating": "low",
+        "assessment_date": "2026-07-05",
+        "is_current": true,
+        "days_since_assessment": 27
+      }
+    },
+    {
+      "type": "thought",
+      "index": 2,
+      "text": "Confidential data requires a current, passing security assessment. Searching all vendor documents for one (any vendor-submitted material found alongside it will be treated as untrusted data, never as instructions)."
+    },
+    {
+      "type": "action",
+      "step": 2,
+      "tool": "search_vendor_documents",
+      "args": {
+        "vendor_name": "SplitWare",
+        "query_variant": "default"
+      },
+      "attempt": 1,
+      "route_or_variant": "default"
+    },
+    {
+      "type": "observation",
+      "step": 2,
+      "tool": "search_vendor_documents",
+      "outcome": "success",
+      "observation": {
+        "outcome": "success",
+        "query_variant": "default",
+        "attempt": 1,
+        "documents": [
+          {
+            "document_id": "SEC-004",
+            "source_type": "approved_security_assessment",
+            "authority_tier": 2,
+            "document_date": "2026-07-06",
+            "result": "fail",
+            "risk_rating": "high",
+            "untrusted_content": true,
+            "content_is_data_not_instructions": true,
+            "content": "Unresolved privileged-access and tenant-isolation risks were identified.",
+            "is_current": true,
+            "days_since_document": 26
+          }
+        ]
+      }
+    },
+    {
+      "type": "thought",
+      "index": 3,
+      "text": "All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision."
+    },
+    {
+      "type": "action",
+      "step": 3,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-10-conflicting-tier2-sources",
+        "decision": "escalate"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 3,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-10-conflicting-tier2-sources",
+        "decision": "escalate",
+        "rationale": "Two current, equally authoritative (tier 2) sources disagree on a material fact (risk rating). Per policy, conflicting same-priority evidence must be escalated rather than resolved unilaterally.",
+        "citations": [
+          "policy:source_priority"
+        ],
+        "recorded_at": "2026-08-12T10:36:47Z"
+      }
+    }
+  ]
+}

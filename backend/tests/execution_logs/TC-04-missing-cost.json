@@ -1,0 +1,58 @@
+{
+  "request_id": "TC-04-missing-cost",
+  "category": "missing_information",
+  "description": "Required field 'cost' is missing -> must request information without calling any tools.",
+  "request": {
+    "vendor_name": "SafeCloud",
+    "product": "TeamDocs",
+    "cost": null,
+    "intended_use": "Store team documents",
+    "data_type": "internal"
+  },
+  "expected_decision": "request_information",
+  "actual_decision": "request_information",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 1,
+  "final_rationale": "Required field(s) missing: cost.",
+  "final_citations": [],
+  "guardrail_events": [],
+  "retry_counts": {},
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-04-missing-cost (SafeCloud / TeamDocs)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Required field(s) missing from the request: cost. No tool call can substitute for missing required information."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-04-missing-cost",
+        "decision": "request_information"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-04-missing-cost",
+        "decision": "request_information",
+        "rationale": "Required field(s) missing: cost.",
+        "citations": [],
+        "recorded_at": "2026-08-12T10:36:46Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "request_id": "TC-13-restricted-data-always-escalates",
+  "category": "normal",
+  "description": "Restricted data type always escalates unconditionally, even for an otherwise clean, low-cost, low-risk vendor.",
+  "request": {
+    "vendor_name": "SafeCloud",
+    "product": "TeamDocs",
+    "cost": 8000,
+    "intended_use": "Store payment credentials",
+    "data_type": "restricted"
+  },
+  "expected_decision": "escalate",
+  "actual_decision": "escalate",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 1,
+  "final_rationale": "Data type is 'restricted', which always requires escalation regardless of cost, vendor status, or evidence.",
+  "final_citations": [
+    "policy:data_types"
+  ],
+  "guardrail_events": [],
+  "retry_counts": {},
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=rule_based (offline)] Starting assessment of request TC-13-restricted-data-always-escalates (SafeCloud / TeamDocs)."
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "data_type is 'restricted'. Policy requires escalation unconditionally; no further tool calls are needed."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-13-restricted-data-always-escalates",
+        "decision": "escalate"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-13-restricted-data-always-escalates",
+        "decision": "escalate",
+        "rationale": "Data type is 'restricted', which always requires escalation regardless of cost, vendor status, or evidence.",
+        "citations": [
+          "policy:data_types"
+        ],
+        "recorded_at": "2026-08-12T10:36:47Z"
+      }
+    }
+  ]
+}
