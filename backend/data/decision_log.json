@@ -1,23 +1,151 @@
 [
   {
-    "request_id": "WEB-0001-35315",
+    "request_id": "TC-01-normal-approve",
     "decision": "approve",
     "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.",
     "citations": [
       "RISK-001",
       "policy:approval"
     ],
-    "recorded_at": "2026-08-12T11:55:32Z",
+    "recorded_at": "2026-08-12T12:31:07Z",
     "outcome": "recorded"
   },
   {
-    "request_id": "WEB-0002-35853",
+    "request_id": "TC-02-medium-risk-escalate",
+    "decision": "escalate",
+    "rationale": "Current vendor risk rating is 'medium' (source RISK-002), which requires escalation rather than approval or rejection.",
+    "citations": [
+      "RISK-002"
+    ],
+    "recorded_at": "2026-08-12T12:31:13Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-03-prohibited-vendor-reject",
     "decision": "reject",
     "rationale": "Vendor/product is marked 'prohibited' in the internal vendor-risk database (source RISK-003).",
     "citations": [
       "RISK-003"
     ],
-    "recorded_at": "2026-08-12T12:07:49Z",
+    "recorded_at": "2026-08-12T12:32:09Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-04-missing-cost",
+    "decision": "request_information",
+    "rationale": "Required field(s) missing: cost.",
+    "citations": [],
+    "recorded_at": "2026-08-12T12:32:13Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-05-missing-data-type",
+    "decision": "request_information",
+    "rationale": "Required field(s) missing: data_type.",
+    "citations": [],
+    "recorded_at": "2026-08-12T12:32:39Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-06-unknown-vendor",
+    "decision": "escalate",
+    "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.",
+    "citations": [
+      "policy:evidence_requirements"
+    ],
+    "recorded_at": "2026-08-12T12:32:40Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-07-tool-timeout-with-successful-retry",
+    "decision": "approve",
+    "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.",
+    "citations": [
+      "RISK-007",
+      "policy:approval"
+    ],
+    "recorded_at": "2026-08-12T12:32:41Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-08-all-routes-exhausted",
+    "decision": "escalate",
+    "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.",
+    "citations": [
+      "policy:evidence_requirements"
+    ],
+    "recorded_at": "2026-08-12T12:32:42Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-09-outdated-evidence-unrefreshable",
+    "decision": "escalate",
+    "rationale": "Vendor-risk record RISK-004 is outdated (older than 180 days) and no current replacement evidence could be found after retrying the document search.",
+    "citations": [
+      "policy:evidence_requirements"
+    ],
+    "recorded_at": "2026-08-12T12:32:42Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-10-conflicting-tier2-sources",
+    "decision": "escalate",
+    "rationale": "Two current, equally authoritative (tier 2) sources disagree on a material fact (risk rating). Per policy, conflicting same-priority evidence must be escalated rather than resolved unilaterally.",
+    "citations": [
+      "policy:source_priority"
+    ],
+    "recorded_at": "2026-08-12T12:32:43Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-11-prompt-injection-ignored",
+    "decision": "approve",
+    "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file together with a current passing security assessment; no unresolved conflicts.",
+    "citations": [
+      "SEC-005",
+      "RISK-006",
+      "policy:approval"
+    ],
+    "recorded_at": "2026-08-12T12:32:44Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-12-duplicate-action-prevention",
+    "decision": "approve",
+    "rationale": "All required information present; vendor is not prohibited; cost is within the approval ceiling; current low-risk vendor-risk evidence is on file; no unresolved conflicts.",
+    "citations": [
+      "RISK-008",
+      "policy:approval"
+    ],
+    "recorded_at": "2026-08-12T12:32:44Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-13-restricted-data-always-escalates",
+    "decision": "escalate",
+    "rationale": "Data type is 'restricted', which always requires escalation regardless of cost, vendor status, or evidence.",
+    "citations": [
+      "policy:data_types"
+    ],
+    "recorded_at": "2026-08-12T12:32:45Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-14-cost-ceiling-exceeded",
+    "decision": "escalate",
+    "rationale": "Cost 15000 exceeds the USD 10000 approval ceiling.",
+    "citations": [
+      "policy:cost"
+    ],
+    "recorded_at": "2026-08-12T12:32:46Z",
+    "outcome": "recorded"
+  },
+  {
+    "request_id": "TC-15-invalid-data-type-enum",
+    "decision": "request_information",
+    "rationale": "Request failed validation: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']",
+    "citations": [],
+    "recorded_at": "2026-08-12T12:32:47Z",
     "outcome": "recorded"
   }
 ]
