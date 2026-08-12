@@ -408,8 +408,8 @@ orchestrator. Each retry must change `route` or `query_variant`.
 
 - Document refresh: stale vendor-risk records trigger a `search_vendor_documents`
 flow with `default` then `corrected` query variants.
-- Provider fallback: if a live LLM provider fails or is unavailable, the
-runtime falls back to `RuleBasedBrain` and logs `llm_provider_unavailable`.
+- Provider fallback & pacing: if a live LLM provider fails or is unavailable, the
+runtime falls back to `RuleBasedBrain` and logs `llm_provider_unavailable`. Live providers (`GeminiBrain` and `LLMBrain`) self-pace requests using a configurable rate limiter (`GEMINI_MAX_RPM`, default `4`, and `LLM_MAX_RPM`, default `60`) to enforce a minimum gap between consecutive calls and prevent HTTP 429 quota exhaustion.
 
 ### Prompt-injection defenses
 - Document `content` is marked `untrusted_content=True` and the planner is

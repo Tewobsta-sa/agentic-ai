@@ -3,12 +3,18 @@ Required field 'cost' is missing -> must request information without calling any
 Input: {"vendor_name": "SafeCloud", "product": "TeamDocs", "cost": null, "intended_use": "Store team documents", "data_type": "internal"}
 ====================================================================================================
 THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-04-missing-cost (SafeCloud / TeamDocs).
-  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 18s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
-THOUGHT: Required field(s) missing from the request: cost. No tool call can substitute for missing required information.
-  ACTION  step=1 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-04-missing-cost", "decision": "request_information"}
-  OBSERVE step=1 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-04-missing-cost", "decision": "request_information", "rationale": "Required field(s) missing: cost.", "citations": [], "recorded_at": "2026-08-12T22:31:26Z"}
+THOUGHT: I will retrieve the vendor-assessment policy to understand the evidence requirements for 'internal' data types.
+  ACTION  step=1 tool=retrieve_policy attempt=1 route/variant=- args={"section": "all"}
+  OBSERVE step=1 tool=retrieve_policy outcome=success -> {"outcome": "success", "section": "all", "content": "# Vendor-Assessment Policy\n\n**Policy version:** 1.0  \n**Evaluation date:** 2026-08-01  \n**Currency:** USD\n\n## Required information\n\nEach request must include:\n\n- vendor name\n- product\n- cost\n- intended use\n- data type\n\nIf any requi
+THOUGHT: The policy requires a current vendor-risk record for 'internal' data. Although the cost field is missing (which eventually leads to requesting information), I must first retrieve the required vendor-risk evidence to satisfy the hard rule before proposing a final decision.
+  ACTION  step=2 tool=lookup_vendor_risk attempt=1 route/variant=- args={"vendor_name": "SafeCloud", "product": "TeamDocs"}
+  OBSERVE step=2 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-001", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "low", "assessment_date": "2026-07-10", "is_current": true, "days_since_assessment": 22}
+THOUGHT: LLM output was not a usable plan object; failing safe.
+  GUARDRAIL[planner_output_unusable]: Planner output could not be parsed as JSON; escalating for manual review.
+  ACTION  step=3 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-04-missing-cost", "decision": "request_information"}
+  OBSERVE step=3 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-04-missing-cost", "decision": "request_information", "rationale": "Required field(s) missing: cost.", "citations": [], "recorded_at": "2026-08-12T23:16:11Z"}
 ====================================================================================================
 FINAL DECISION: request_information  (expected: request_information, PASS)
-STOP REASON: goal_complete
+STOP REASON: planner_unusable
 RATIONALE: Required field(s) missing: cost.
 CITATIONS: []

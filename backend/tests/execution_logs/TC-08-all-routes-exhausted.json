@@ -21,7 +21,7 @@
   "guardrail_events": [
     {
       "kind": "llm_provider_unavailable",
-      "detail": "Gemini is in a 14s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "detail": "Gemini call failed (HTTP 429 RPD limit hit [quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier]): Requests-Per-Day limit reached; this limit won't clear today. Stopping backoff attempts immediately. Detail: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
       "step": 0,
       "seq": 2
     },
@@ -55,7 +55,7 @@
     {
       "type": "guardrail",
       "kind": "llm_provider_unavailable",
-      "detail": "Gemini is in a 14s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "detail": "Gemini call failed (HTTP 429 RPD limit hit [quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier]): Requests-Per-Day limit reached; this limit won't clear today. Stopping backoff attempts immediately. Detail: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
       "step": 0,
       "seq": 2
     },
@@ -227,7 +227,7 @@
         "citations": [
           "policy:evidence_requirements"
         ],
-        "recorded_at": "2026-08-12T22:31:29Z"
+        "recorded_at": "2026-08-12T23:18:37Z"
       }
     }
   ]

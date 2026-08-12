@@ -3,18 +3,27 @@ Vendor not present in any internal system at all -> risk lookup returns not_foun
 Input: {"vendor_name": "GhostVendor", "product": "Mystery Tool", "cost": 3000, "intended_use": "Trial a new tool", "data_type": "internal"}
 ====================================================================================================
 THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-06-unknown-vendor (GhostVendor / Mystery Tool).
-  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 16s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
-THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
-  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "GhostVendor", "product": "Mystery Tool", "route": "primary"}
-  OBSERVE step=1 tool=lookup_vendor_risk outcome=not_found -> {"outcome": "not_found", "route": "primary", "attempt": 1, "vendor_name": "GhostVendor"}
-THOUGHT: The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach).
-  ACTION  step=2 tool=lookup_vendor_risk attempt=2 route/variant=backup args={"vendor_name": "GhostVendor", "product": "Mystery Tool", "route": "backup"}
-  OBSERVE step=2 tool=lookup_vendor_risk outcome=not_found -> {"outcome": "not_found", "route": "backup", "attempt": 1, "vendor_name": "GhostVendor"}
+THOUGHT: I will retrieve the vendor-assessment policy to understand the evidence requirements for 'internal' data_type.
+  ACTION  step=1 tool=retrieve_policy attempt=1 route/variant=- args={"section": "all"}
+  OBSERVE step=1 tool=retrieve_policy outcome=success -> {"outcome": "success", "section": "all", "content": "# Vendor-Assessment Policy\n\n**Policy version:** 1.0  \n**Evaluation date:** 2026-08-01  \n**Currency:** USD\n\n## Required information\n\nEach request must include:\n\n- vendor name\n- product\n- cost\n- intended use\n- data type\n\nIf any requi
+THOUGHT: The policy requires a current vendor-risk record for 'internal' data. I will look up the vendor risk for GhostVendor.
+  ACTION  step=2 tool=lookup_vendor_risk attempt=1 route/variant=- args={"vendor_name": "GhostVendor", "product": "Mystery Tool"}
+  OBSERVE step=2 tool=lookup_vendor_risk outcome=not_found -> {"outcome": "not_found", "route": "primary", "attempt": 1, "vendor_name": "GhostVendor"}
+THOUGHT: The primary lookup for GhostVendor returned not_found. I will retry the lookup using the backup route to see if the vendor risk record exists there.
+  ACTION  step=3 tool=lookup_vendor_risk attempt=2 route/variant=backup args={"vendor_name": "GhostVendor", "product": "Mystery Tool", "route": "backup"}
+  OBSERVE step=3 tool=lookup_vendor_risk outcome=not_found -> {"outcome": "not_found", "route": "backup", "attempt": 1, "vendor_name": "GhostVendor"}
+THOUGHT: The vendor-risk lookup on both primary and backup routes returned not_found. I will search the vendor documents for GhostVendor to see if there is any risk evidence or approved security assessment available before making a final decision.
+  ACTION  step=4 tool=search_vendor_documents attempt=1 route/variant=- args={"vendor_name": "GhostVendor"}
+  OBSERVE step=4 tool=search_vendor_documents outcome=no_results -> {"outcome": "no_results", "query_variant": "default", "attempt": 1, "documents": []}
+THOUGHT: The first search for vendor documents returned no results. I will retry searching vendor documents using the 'corrected' query variant to see if any risk evidence can be found before making a final decision.
+  ACTION  step=5 tool=search_vendor_documents attempt=2 route/variant=corrected args={"vendor_name": "GhostVendor", "query_variant": "corrected"}
+  OBSERVE step=5 tool=search_vendor_documents outcome=no_results -> {"outcome": "no_results", "query_variant": "corrected", "attempt": 1, "documents": []}
+  GUARDRAIL[llm_provider_unavailable]: Gemini call failed (HTTP 429 RPD limit hit [quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier]): Requests-Per-Day limit reached; this limit won't clear today. Stopping backoff attempts immediately. Detail: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach).
   GUARDRAIL[repeated_route_rejected]: Planner tried route/variant 'backup' for 'lookup_vendor_risk::GhostVendor' more than once; policy requires each retry to use a corrected query or a different approach.
 THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
-  ACTION  step=3 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-06-unknown-vendor", "decision": "escalate"}
-  OBSERVE step=3 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-06-unknown-vendor", "decision": "escalate", "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.", "citations": ["policy:evidence_r
+  ACTION  step=6 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-06-unknown-vendor", "decision": "escalate"}
+  OBSERVE step=6 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-06-unknown-vendor", "decision": "escalate", "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.", "citations": ["policy:evidence_r
 ====================================================================================================
 FINAL DECISION: escalate  (expected: escalate, PASS)
 STOP REASON: goal_complete

@@ -3,10 +3,12 @@ Required field 'data_type' is missing -> must request information.
 Input: {"vendor_name": "SafeCloud", "product": "TeamDocs", "cost": 7000, "intended_use": "Store project documents", "data_type": null}
 ====================================================================================================
 THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-05-missing-data-type (SafeCloud / TeamDocs).
-  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 17s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
-THOUGHT: Required field(s) missing from the request: data_type. No tool call can substitute for missing required information.
-  ACTION  step=1 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-05-missing-data-type", "decision": "request_information"}
-  OBSERVE step=1 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-05-missing-data-type", "decision": "request_information", "rationale": "Required field(s) missing: data_type.", "citations": [], "recorded_at": "2026-08-12T22:31:26Z"}
+THOUGHT: I need to retrieve the vendor-assessment policy to understand the requirements for this request, especially since the data_type is null.
+  ACTION  step=1 tool=retrieve_policy attempt=1 route/variant=- args={"section": "all"}
+  OBSERVE step=1 tool=retrieve_policy outcome=success -> {"outcome": "success", "section": "all", "content": "# Vendor-Assessment Policy\n\n**Policy version:** 1.0  \n**Evaluation date:** 2026-08-01  \n**Currency:** USD\n\n## Required information\n\nEach request must include:\n\n- vendor name\n- product\n- cost\n- intended use\n- data type\n\nIf any requi
+THOUGHT: The request is missing the required 'data_type' field. According to the policy, if any required field is missing, the decision must be REQUEST_INFORMATION.
+  ACTION  step=2 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-05-missing-data-type", "decision": "request_information"}
+  OBSERVE step=2 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-05-missing-data-type", "decision": "request_information", "rationale": "Required field(s) missing: data_type.", "citations": [], "recorded_at": "2026-08-12T23:16:45Z"}
 ====================================================================================================
 FINAL DECISION: request_information  (expected: request_information, PASS)
 STOP REASON: goal_complete

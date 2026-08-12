@@ -35,6 +35,7 @@ import json
 import os
 import random
 import re
+import threading
 import time
 from typing import Any, Callable, Dict, List, Optional
 
@@ -50,6 +51,43 @@ MAX_PROVIDER_ATTEMPTS = int(os.environ.get("LLM_MAX_ATTEMPTS", "3"))
 MAX_PROVIDER_BACKOFF_SECONDS = float(os.environ.get("LLM_MAX_BACKOFF_SECONDS", "20"))
 
 
+class RateLimiter:
+    """Enforces a minimum interval between consecutive API calls to prevent quota exhaustion."""
+
+    def __init__(self, env_var: str, default_rpm: float):
+        self.env_var = env_var
+        self.default_rpm = default_rpm
+        self.last_call_time: float = 0.0
+        self._lock = threading.Lock()
+
+    def get_min_interval(self) -> float:
+        val = os.environ.get(self.env_var)
+        if val:
+            try:
+                rpm = float(val)
+            except (TypeError, ValueError):
+                rpm = self.default_rpm
+        else:
+            rpm = self.default_rpm
+        return 60.0 / rpm if rpm > 0 else 0.0
+
+    def wait_if_needed(self) -> None:
+        min_interval = self.get_min_interval()
+        if min_interval <= 0:
+            return
+        with self._lock:
+            now = time.time()
+            if self.last_call_time > 0:
+                elapsed = now - self.last_call_time
+                if elapsed < min_interval:
+                    time.sleep(min_interval - elapsed)
+            self.last_call_time = time.time()
+
+
+_GEMINI_LIMITER = RateLimiter("GEMINI_MAX_RPM", 4.0)
+_CLAUDE_LIMITER = RateLimiter("LLM_MAX_RPM", 60.0)
+
+
 class ProviderError(RuntimeError):
     """A live-LLM call failed and could not be retried into a success.
 
@@ -59,11 +97,14 @@ class ProviderError(RuntimeError):
     """
 
     def __init__(self, message: str, *, status_code: Optional[int] = None,
-                 retry_after: Optional[float] = None, attempts: int = 1):
+                 retry_after: Optional[float] = None, attempts: int = 1,
+                 quota_type: Optional[str] = None, quota_id: Optional[str] = None):
         super().__init__(message)
         self.status_code = status_code
         self.retry_after = retry_after
         self.attempts = attempts
+        self.quota_type = quota_type
+        self.quota_id = quota_id
 
 
 def _status_code_of(exc: BaseException) -> Optional[int]:
@@ -83,6 +124,46 @@ _RETRY_HINT_PATTERNS = (
     r"['\"]retryDelay['\"]:\s*['\"](\d+(?:\.\d+)?)s['\"]",
     r"retry in (\d+(?:\.\d+)?)s",
 )
+
+_QUOTA_ID_PATTERNS = (
+    re.compile(r"['\"]?quotaId['\"]?\s*[:=]\s*['\"]?([A-Za-z0-9_\-]+)['\"]?", re.IGNORECASE),
+    re.compile(r"['\"]?quota_id['\"]?\s*[:=]\s*['\"]?([A-Za-z0-9_\-]+)['\"]?", re.IGNORECASE),
+    re.compile(r"limit\s*['\"]?([A-Za-z0-9_\-]+Per[A-Za-z0-9_\-]+)['\"]?", re.IGNORECASE),
+)
+
+
+def _parse_quota_info(exc: BaseException) -> tuple[Optional[str], Optional[str]]:
+    """Extract (quota_id, quota_type) from a provider exception.
+
+    quota_type is classified as either:
+      - 'RPD' (Requests Per Day): won't clear today, non-retryable.
+      - 'RPM' (Requests Per Minute): clears in ~a minute, retryable.
+      - None: not a quota error or unclassified.
+    """
+    text = str(exc)
+    quota_id: Optional[str] = None
+    for pattern in _QUOTA_ID_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            quota_id = match.group(1)
+            break
+
+    search_space = f"{quota_id or ''} {text}".lower()
+
+    # RPD (Requests Per Day / Daily quota limit)
+    if any(k in search_space for k in ("perday", "requestsperday", "rpd", "per day", "daily quota")):
+        return quota_id, "RPD"
+
+    # RPM (Requests Per Minute / Minute quota limit)
+    if any(k in search_space for k in ("perminute", "requestsperminute", "rpm", "per minute")):
+        return quota_id, "RPM"
+
+    status = _status_code_of(exc)
+    if status == 429:
+        # Default 429 status without explicit RPD markers is treated as RPM
+        return quota_id, "RPM"
+
+    return quota_id, None
 
 
 def _retry_after_seconds(exc: BaseException) -> Optional[float]:
@@ -106,6 +187,10 @@ def _retry_after_seconds(exc: BaseException) -> Optional[float]:
 
 
 def _is_retryable(exc: BaseException) -> bool:
+    _, quota_type = _parse_quota_info(exc)
+    if quota_type == "RPD":
+        # RPD limit won't clear today. Retrying against an RPD error is useless.
+        return False
     status = _status_code_of(exc)
     if status is not None:
         return status in RETRYABLE_STATUS
@@ -132,7 +217,7 @@ def _start_cooldown(seconds: float) -> None:
     _cooldown_until = max(_cooldown_until, time.time() + min(seconds, MAX_PROVIDER_BACKOFF_SECONDS))
 
 
-def _call_with_backoff(fn: Callable[[], Any], provider: str) -> Any:
+def _call_with_backoff(fn: Callable[[], Any], provider: str, limiter: Optional[RateLimiter] = None) -> Any:
     """Invoke a provider call, retrying transient failures with backoff that
     honors the provider's own retry hint. Raises ProviderError on give-up."""
     remaining = _cooldown_remaining()
@@ -142,21 +227,56 @@ def _call_with_backoff(fn: Callable[[], Any], provider: str) -> Any:
             f"skipping the call rather than burning another rate-limited request.",
             status_code=429, retry_after=remaining, attempts=0)
 
+    if limiter is not None:
+        limiter.wait_if_needed()
+
     for attempt in range(1, MAX_PROVIDER_ATTEMPTS + 1):
         try:
             return fn()
         except Exception as exc:
             status = _status_code_of(exc)
             hinted = _retry_after_seconds(exc)
-            if status == 429 and hinted:
-                _start_cooldown(hinted)
+            quota_id, quota_type = _parse_quota_info(exc)
+
+            if status == 429 or quota_type is not None:
+                if quota_type == "RPD":
+                    # RPD will not clear today. Stop wasting time retrying against RPD.
+                    q_id_str = f" [quotaId: {quota_id}]" if quota_id else ""
+                    detail = " ".join(str(exc).split())[:400]
+                    raise ProviderError(
+                        f"{provider} call failed (HTTP 429 RPD limit hit{q_id_str}): "
+                        f"Requests-Per-Day limit reached; this limit won't clear today. "
+                        f"Stopping backoff attempts immediately. Detail: {detail}",
+                        status_code=429,
+                        retry_after=hinted,
+                        attempts=attempt,
+                        quota_type="RPD",
+                        quota_id=quota_id,
+                    ) from exc
+
+                if hinted:
+                    _start_cooldown(hinted)
+
             if not _is_retryable(exc) or attempt == MAX_PROVIDER_ATTEMPTS:
                 detail = " ".join(str(exc).split())[:400]
+                quota_tag = ""
+                if quota_type == "RPM":
+                    q_id_str = f", quotaId: {quota_id}" if quota_id else ""
+                    quota_tag = f" [RPM limit hit{q_id_str} - clears in ~1 min]"
+                elif quota_id:
+                    quota_tag = f" [quotaId: {quota_id}]"
+
                 raise ProviderError(
-                    f"{provider} call failed after {attempt} attempt(s) "
+                    f"{provider} call failed after {attempt} attempt(s)"
+                    f"{quota_tag} "
                     f"[{exc.__class__.__name__}"
                     f"{f', HTTP {status}' if status else ''}]: {detail}",
-                    status_code=status, retry_after=hinted, attempts=attempt) from exc
+                    status_code=status,
+                    retry_after=hinted,
+                    attempts=attempt,
+                    quota_type=quota_type,
+                    quota_id=quota_id,
+                ) from exc
 
             delay = min(hinted if hinted is not None else 2.0 ** (attempt - 1),
                         MAX_PROVIDER_BACKOFF_SECONDS)
@@ -503,6 +623,7 @@ class LLMBrain(Brain):
                 messages=[{"role": "user", "content": json.dumps(user_payload, indent=2)}],
             ),
             provider="Claude",
+            limiter=_CLAUDE_LIMITER,
         )
 
         for block in message.content:
@@ -549,6 +670,7 @@ class GeminiBrain(Brain):
                 ),
             ),
             provider="Gemini",
+            limiter=_GEMINI_LIMITER,
         )
         return _parse_planner_json(response.text or "")
 
