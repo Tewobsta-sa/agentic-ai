@@ -3,13 +3,13 @@ Prohibited vendor/product -> hard reject regardless of cost or data type.
 Input: {"vendor_name": "BlockedSoft", "product": "SyncNow", "cost": 5000, "intended_use": "Synchronize company files", "data_type": "internal"}
 ====================================================================================================
 THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-03-prohibited-vendor-reject (BlockedSoft / SyncNow).
-  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 19s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
+  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 18s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
   ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "BlockedSoft", "product": "SyncNow", "route": "primary"}
   OBSERVE step=1 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-003", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "prohibited", "risk_rating": "high", "assessment_date": "2026-07-12", "is_current": true, "days_since_assessment": 20}
 THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
   ACTION  step=2 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-03-prohibited-vendor-reject", "decision": "reject"}
-  OBSERVE step=2 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-03-prohibited-vendor-reject", "decision": "reject", "rationale": "Vendor/product is marked 'prohibited' in the internal vendor-risk database (source RISK-003).", "citations": ["RISK-003"], "recorded_at": "2026-08-12T20:21:04Z"}
+  OBSERVE step=2 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-03-prohibited-vendor-reject", "decision": "reject", "rationale": "Vendor/product is marked 'prohibited' in the internal vendor-risk database (source RISK-003).", "citations": ["RISK-003"], "recorded_at": "2026-08-12T22:31:25Z"}
 ====================================================================================================
 FINAL DECISION: reject  (expected: reject, PASS)
 STOP REASON: goal_complete

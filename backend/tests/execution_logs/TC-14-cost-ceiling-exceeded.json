@@ -21,7 +21,7 @@
   "guardrail_events": [
     {
       "kind": "llm_provider_unavailable",
-      "detail": "Gemini is in a 6s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "detail": "Gemini is in a 9s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
       "step": 0,
       "seq": 2
     }
@@ -36,7 +36,7 @@
     {
       "type": "guardrail",
       "kind": "llm_provider_unavailable",
-      "detail": "Gemini is in a 6s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "detail": "Gemini is in a 9s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
       "step": 0,
       "seq": 2
     },
@@ -69,7 +69,7 @@
         "citations": [
           "policy:cost"
         ],
-        "recorded_at": "2026-08-12T20:21:16Z"
+        "recorded_at": "2026-08-12T22:31:34Z"
       }
     }
   ]

@@ -39,7 +39,7 @@
     "second_submission_guardrail_events": [
       {
         "kind": "llm_provider_unavailable",
-        "detail": "Gemini is in a 4s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+        "detail": "Gemini is in a 7s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
         "step": 0,
         "seq": 2
       },
@@ -66,7 +66,7 @@
       "expected_decision": "escalate",
       "actual_decision": "escalate",
       "pass": true,
-      "steps_taken": 3
+      "steps_taken": 2
     },
     {
       "request_id": "TC-03-prohibited-vendor-reject",
