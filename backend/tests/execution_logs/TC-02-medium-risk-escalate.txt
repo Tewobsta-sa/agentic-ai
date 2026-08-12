@@ -2,13 +2,17 @@ REQUEST TC-02-medium-risk-escalate  [normal]
 Vendor has a current medium risk rating -> must escalate, not approve or reject.
 Input: {"vendor_name": "DataBridge", "product": "InsightPro", "cost": 9000, "intended_use": "Analyze internal operational metrics", "data_type": "internal"}
 ====================================================================================================
-THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-02-medium-risk-escalate (DataBridge / InsightPro).
+THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-02-medium-risk-escalate (DataBridge / InsightPro).
+THOUGHT: The first step in any assessment is to retrieve the vendor-assessment policy to understand the evidence requirements for the 'internal' data type.
+  ACTION  step=1 tool=retrieve_policy attempt=1 route/variant=- args={}
+  OBSERVE step=1 tool=retrieve_policy outcome=success -> {"outcome": "success", "section": "all", "content": "# Vendor-Assessment Policy\n\n**Policy version:** 1.0  \n**Evaluation date:** 2026-08-01  \n**Currency:** USD\n\n## Required information\n\nEach request must include:\n\n- vendor name\n- product\n- cost\n- intended use\n- data type\n\nIf any requi
+  GUARDRAIL[llm_provider_unavailable]: Gemini call failed after 3 attempt(s) [ClientError, HTTP 429]: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
-  ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "DataBridge", "product": "InsightPro", "route": "primary"}
-  OBSERVE step=1 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-002", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "medium", "assessment_date": "2026-06-20", "is_current": true, "days_since_assessment": 42}
+  ACTION  step=2 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "DataBridge", "product": "InsightPro", "route": "primary"}
+  OBSERVE step=2 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-002", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "medium", "assessment_date": "2026-06-20", "is_current": true, "days_since_assessment": 42}
 THOUGHT: All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision.
-  ACTION  step=2 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-02-medium-risk-escalate", "decision": "escalate"}
-  OBSERVE step=2 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-02-medium-risk-escalate", "decision": "escalate", "rationale": "Current vendor risk rating is 'medium' (source RISK-002), which requires escalation rather than approval or rejection.", "citations": ["RISK-002"], "recorded_at": "2026-08-12T10:36:46Z"}
+  ACTION  step=3 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-02-medium-risk-escalate", "decision": "escalate"}
+  OBSERVE step=3 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-02-medium-risk-escalate", "decision": "escalate", "rationale": "Current vendor risk rating is 'medium' (source RISK-002), which requires escalation rather than approval or rejection.", "citations": ["RISK-002"], "recorded_at": "2026-08-12T20:21:03Z"}
 ====================================================================================================
 FINAL DECISION: escalate  (expected: escalate, PASS)
 STOP REASON: goal_complete

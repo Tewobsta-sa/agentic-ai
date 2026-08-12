@@ -2,10 +2,11 @@ REQUEST TC-14-cost-ceiling-exceeded  [normal]
 Cost exceeds the USD 10,000 ceiling -> escalate regardless of otherwise-clean risk profile.
 Input: {"vendor_name": "BudgetSoft", "product": "NotesPlus", "cost": 15000, "intended_use": "Create internal meeting notes", "data_type": "internal"}
 ====================================================================================================
-THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-14-cost-ceiling-exceeded (BudgetSoft / NotesPlus).
+THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-14-cost-ceiling-exceeded (BudgetSoft / NotesPlus).
+  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 6s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Cost 15000 exceeds the 10000 ceiling. Escalating without needing further risk evidence.
   ACTION  step=1 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-14-cost-ceiling-exceeded", "decision": "escalate"}
-  OBSERVE step=1 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-14-cost-ceiling-exceeded", "decision": "escalate", "rationale": "Cost 15000 exceeds the USD 10000 approval ceiling.", "citations": ["policy:cost"], "recorded_at": "2026-08-12T10:36:47Z"}
+  OBSERVE step=1 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-14-cost-ceiling-exceeded", "decision": "escalate", "rationale": "Cost 15000 exceeds the USD 10000 approval ceiling.", "citations": ["policy:cost"], "recorded_at": "2026-08-12T20:21:16Z"}
 ====================================================================================================
 FINAL DECISION: escalate  (expected: escalate, PASS)
 STOP REASON: goal_complete

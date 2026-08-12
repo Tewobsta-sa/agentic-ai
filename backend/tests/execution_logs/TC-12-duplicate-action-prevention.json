@@ -19,7 +19,14 @@
     "RISK-008",
     "policy:approval"
   ],
-  "guardrail_events": [],
+  "guardrail_events": [
+    {
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 9s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
+    }
+  ],
   "retry_counts": {
     "lookup_vendor_risk::DuplicateCo": 1,
     "lookup_vendor_risk::DuplicateCo::primary": 1
@@ -28,7 +35,14 @@
     {
       "type": "thought",
       "index": 0,
-      "text": "[brain=rule_based (offline)] Starting assessment of request TC-12-duplicate-action-prevention (DuplicateCo / FlowDesk)."
+      "text": "[brain=llm (online, gemini)] Starting assessment of request TC-12-duplicate-action-prevention (DuplicateCo / FlowDesk)."
+    },
+    {
+      "type": "guardrail",
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 9s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
     },
     {
       "type": "thought",
@@ -96,7 +110,7 @@
           "RISK-008",
           "policy:approval"
         ],
-        "recorded_at": "2026-08-12T10:36:47Z"
+        "recorded_at": "2026-08-12T20:21:14Z"
       }
     }
   ]

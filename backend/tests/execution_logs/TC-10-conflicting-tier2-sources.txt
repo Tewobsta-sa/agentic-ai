@@ -2,7 +2,8 @@ REQUEST TC-10-conflicting-tier2-sources  [conflicting_evidence]
 Internal vendor-risk DB says 'low', a same-tier approved security assessment says 'high' -> equal-authority conflict must be escalated, not resolved unilaterally.
 Input: {"vendor_name": "SplitWare", "product": "SecureShare", "cost": 7000, "intended_use": "Share confidential project files", "data_type": "confidential"}
 ====================================================================================================
-THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-10-conflicting-tier2-sources (SplitWare / SecureShare).
+THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-10-conflicting-tier2-sources (SplitWare / SecureShare).
+  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 11s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
   ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "SplitWare", "product": "SecureShare", "route": "primary"}
   OBSERVE step=1 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-005", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "low", "assessment_date": "2026-07-05", "is_current": true, "days_since_assessment": 27}

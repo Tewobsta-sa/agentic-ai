@@ -20,10 +20,16 @@
   ],
   "guardrail_events": [
     {
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 16s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
+    },
+    {
       "kind": "repeated_route_rejected",
       "detail": "Planner tried route/variant 'backup' for 'lookup_vendor_risk::GhostVendor' more than once; policy requires each retry to use a corrected query or a different approach.",
       "step": 2,
-      "seq": 7
+      "seq": 8
     }
   ],
   "retry_counts": {
@@ -35,7 +41,14 @@
     {
       "type": "thought",
       "index": 0,
-      "text": "[brain=rule_based (offline)] Starting assessment of request TC-06-unknown-vendor (GhostVendor / Mystery Tool)."
+      "text": "[brain=llm (online, gemini)] Starting assessment of request TC-06-unknown-vendor (GhostVendor / Mystery Tool)."
+    },
+    {
+      "type": "guardrail",
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 16s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
     },
     {
       "type": "thought",
@@ -105,7 +118,7 @@
       "kind": "repeated_route_rejected",
       "detail": "Planner tried route/variant 'backup' for 'lookup_vendor_risk::GhostVendor' more than once; policy requires each retry to use a corrected query or a different approach.",
       "step": 2,
-      "seq": 7
+      "seq": 8
     },
     {
       "type": "thought",
@@ -136,7 +149,7 @@
         "citations": [
           "policy:evidence_requirements"
         ],
-        "recorded_at": "2026-08-12T10:36:46Z"
+        "recorded_at": "2026-08-12T20:21:07Z"
       }
     }
   ]

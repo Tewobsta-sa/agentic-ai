@@ -7,7 +7,7 @@
       "RISK-001",
       "policy:approval"
     ],
-    "recorded_at": "2026-08-12T12:31:07Z",
+    "recorded_at": "2026-08-12T20:20:02Z",
     "outcome": "recorded"
   },
   {
@@ -17,7 +17,7 @@
     "citations": [
       "RISK-002"
     ],
-    "recorded_at": "2026-08-12T12:31:13Z",
+    "recorded_at": "2026-08-12T20:21:03Z",
     "outcome": "recorded"
   },
   {
@@ -27,7 +27,7 @@
     "citations": [
       "RISK-003"
     ],
-    "recorded_at": "2026-08-12T12:32:09Z",
+    "recorded_at": "2026-08-12T20:21:04Z",
     "outcome": "recorded"
   },
   {
@@ -35,7 +35,7 @@
     "decision": "request_information",
     "rationale": "Required field(s) missing: cost.",
     "citations": [],
-    "recorded_at": "2026-08-12T12:32:13Z",
+    "recorded_at": "2026-08-12T20:21:05Z",
     "outcome": "recorded"
   },
   {
@@ -43,7 +43,7 @@
     "decision": "request_information",
     "rationale": "Required field(s) missing: data_type.",
     "citations": [],
-    "recorded_at": "2026-08-12T12:32:39Z",
+    "recorded_at": "2026-08-12T20:21:06Z",
     "outcome": "recorded"
   },
   {
@@ -53,7 +53,7 @@
     "citations": [
       "policy:evidence_requirements"
     ],
-    "recorded_at": "2026-08-12T12:32:40Z",
+    "recorded_at": "2026-08-12T20:21:07Z",
     "outcome": "recorded"
   },
   {
@@ -64,7 +64,7 @@
       "RISK-007",
       "policy:approval"
     ],
-    "recorded_at": "2026-08-12T12:32:41Z",
+    "recorded_at": "2026-08-12T20:21:08Z",
     "outcome": "recorded"
   },
   {
@@ -74,7 +74,7 @@
     "citations": [
       "policy:evidence_requirements"
     ],
-    "recorded_at": "2026-08-12T12:32:42Z",
+    "recorded_at": "2026-08-12T20:21:09Z",
     "outcome": "recorded"
   },
   {
@@ -84,7 +84,7 @@
     "citations": [
       "policy:evidence_requirements"
     ],
-    "recorded_at": "2026-08-12T12:32:42Z",
+    "recorded_at": "2026-08-12T20:21:11Z",
     "outcome": "recorded"
   },
   {
@@ -94,7 +94,7 @@
     "citations": [
       "policy:source_priority"
     ],
-    "recorded_at": "2026-08-12T12:32:43Z",
+    "recorded_at": "2026-08-12T20:21:12Z",
     "outcome": "recorded"
   },
   {
@@ -106,7 +106,7 @@
       "RISK-006",
       "policy:approval"
     ],
-    "recorded_at": "2026-08-12T12:32:44Z",
+    "recorded_at": "2026-08-12T20:21:13Z",
     "outcome": "recorded"
   },
   {
@@ -117,7 +117,7 @@
       "RISK-008",
       "policy:approval"
     ],
-    "recorded_at": "2026-08-12T12:32:44Z",
+    "recorded_at": "2026-08-12T20:21:14Z",
     "outcome": "recorded"
   },
   {
@@ -127,7 +127,7 @@
     "citations": [
       "policy:data_types"
     ],
-    "recorded_at": "2026-08-12T12:32:45Z",
+    "recorded_at": "2026-08-12T20:21:15Z",
     "outcome": "recorded"
   },
   {
@@ -137,7 +137,7 @@
     "citations": [
       "policy:cost"
     ],
-    "recorded_at": "2026-08-12T12:32:46Z",
+    "recorded_at": "2026-08-12T20:21:16Z",
     "outcome": "recorded"
   },
   {
@@ -145,7 +145,7 @@
     "decision": "request_information",
     "rationale": "Request failed validation: data_type 'top_secret' is not one of ['confidential', 'internal', 'public', 'restricted']",
     "citations": [],
-    "recorded_at": "2026-08-12T12:32:47Z",
+    "recorded_at": "2026-08-12T20:21:17Z",
     "outcome": "recorded"
   }
 ]

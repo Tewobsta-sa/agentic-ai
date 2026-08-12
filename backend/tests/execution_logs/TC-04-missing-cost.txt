@@ -2,10 +2,11 @@ REQUEST TC-04-missing-cost  [missing_information]
 Required field 'cost' is missing -> must request information without calling any tools.
 Input: {"vendor_name": "SafeCloud", "product": "TeamDocs", "cost": null, "intended_use": "Store team documents", "data_type": "internal"}
 ====================================================================================================
-THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-04-missing-cost (SafeCloud / TeamDocs).
+THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-04-missing-cost (SafeCloud / TeamDocs).
+  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 18s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Required field(s) missing from the request: cost. No tool call can substitute for missing required information.
   ACTION  step=1 tool=record_final_decision attempt=1 route/variant=- args={"request_id": "TC-04-missing-cost", "decision": "request_information"}
-  OBSERVE step=1 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-04-missing-cost", "decision": "request_information", "rationale": "Required field(s) missing: cost.", "citations": [], "recorded_at": "2026-08-12T10:36:46Z"}
+  OBSERVE step=1 tool=record_final_decision outcome=recorded -> {"outcome": "recorded", "request_id": "TC-04-missing-cost", "decision": "request_information", "rationale": "Required field(s) missing: cost.", "citations": [], "recorded_at": "2026-08-12T20:21:05Z"}
 ====================================================================================================
 FINAL DECISION: request_information  (expected: request_information, PASS)
 STOP REASON: goal_complete

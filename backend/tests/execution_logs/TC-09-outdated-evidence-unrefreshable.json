@@ -20,10 +20,16 @@
   ],
   "guardrail_events": [
     {
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 12s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
+    },
+    {
       "kind": "repeated_route_rejected",
       "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::OldStack' more than once; policy requires each retry to use a corrected query or a different approach.",
       "step": 3,
-      "seq": 9
+      "seq": 10
     }
   ],
   "retry_counts": {
@@ -37,7 +43,14 @@
     {
       "type": "thought",
       "index": 0,
-      "text": "[brain=rule_based (offline)] Starting assessment of request TC-09-outdated-evidence-unrefreshable (OldStack / LegacyCRM)."
+      "text": "[brain=llm (online, gemini)] Starting assessment of request TC-09-outdated-evidence-unrefreshable (OldStack / LegacyCRM)."
+    },
+    {
+      "type": "guardrail",
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 12s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
     },
     {
       "type": "thought",
@@ -141,7 +154,7 @@
       "kind": "repeated_route_rejected",
       "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::OldStack' more than once; policy requires each retry to use a corrected query or a different approach.",
       "step": 3,
-      "seq": 9
+      "seq": 10
     },
     {
       "type": "thought",
@@ -172,7 +185,7 @@
         "citations": [
           "policy:evidence_requirements"
         ],
-        "recorded_at": "2026-08-12T10:36:46Z"
+        "recorded_at": "2026-08-12T20:21:11Z"
       }
     }
   ]

@@ -16,13 +16,27 @@
   "steps_taken": 1,
   "final_rationale": "Required field(s) missing: data_type.",
   "final_citations": [],
-  "guardrail_events": [],
+  "guardrail_events": [
+    {
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 17s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
+    }
+  ],
   "retry_counts": {},
   "trace": [
     {
       "type": "thought",
       "index": 0,
-      "text": "[brain=rule_based (offline)] Starting assessment of request TC-05-missing-data-type (SafeCloud / TeamDocs)."
+      "text": "[brain=llm (online, gemini)] Starting assessment of request TC-05-missing-data-type (SafeCloud / TeamDocs)."
+    },
+    {
+      "type": "guardrail",
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini is in a 17s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
     },
     {
       "type": "thought",
@@ -51,7 +65,7 @@
         "decision": "request_information",
         "rationale": "Required field(s) missing: data_type.",
         "citations": [],
-        "recorded_at": "2026-08-12T10:36:46Z"
+        "recorded_at": "2026-08-12T20:21:06Z"
       }
     }
   ]

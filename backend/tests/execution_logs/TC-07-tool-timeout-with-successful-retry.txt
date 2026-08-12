@@ -2,7 +2,8 @@ REQUEST TC-07-tool-timeout-with-successful-retry  [tool_failures]
 Primary vendor-risk route times out; agent must retry via the backup route (a different, valid approach) and succeed.
 Input: {"vendor_name": "TimeoutLabs", "product": "MetricsHub", "cost": 7500, "intended_use": "Monitor internal system metrics", "data_type": "internal"}
 ====================================================================================================
-THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-07-tool-timeout-with-successful-retry (TimeoutLabs / MetricsHub).
+THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-07-tool-timeout-with-successful-retry (TimeoutLabs / MetricsHub).
+  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 14s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
   ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "TimeoutLabs", "product": "MetricsHub", "route": "primary"}
   OBSERVE step=1 tool=lookup_vendor_risk outcome=timeout -> {"outcome": "timeout", "route": "primary", "attempt": 1, "detail": "lookup_vendor_risk (primary) timed out on attempt 1."}

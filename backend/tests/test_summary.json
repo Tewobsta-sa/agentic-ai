@@ -38,10 +38,16 @@
     "no_duplicate_written": true,
     "second_submission_guardrail_events": [
       {
+        "kind": "llm_provider_unavailable",
+        "detail": "Gemini is in a 4s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+        "step": 0,
+        "seq": 2
+      },
+      {
         "kind": "duplicate_prevented",
         "detail": "Request TC-12-duplicate-action-prevention already had a recorded decision ('approve'); not recording a duplicate.",
         "step": 2,
-        "seq": 6
+        "seq": 7
       }
     ]
   },
@@ -52,7 +58,7 @@
       "expected_decision": "approve",
       "actual_decision": "approve",
       "pass": true,
-      "steps_taken": 2
+      "steps_taken": 3
     },
     {
       "request_id": "TC-02-medium-risk-escalate",
@@ -60,7 +66,7 @@
       "expected_decision": "escalate",
       "actual_decision": "escalate",
       "pass": true,
-      "steps_taken": 2
+      "steps_taken": 3
     },
     {
       "request_id": "TC-03-prohibited-vendor-reject",

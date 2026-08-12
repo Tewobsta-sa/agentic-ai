@@ -2,7 +2,8 @@ REQUEST TC-09-outdated-evidence-unrefreshable  [tool_failures]
 Vendor-risk record is stale (>180 days); agent retries document search with a corrected query but still finds nothing current -> escalate.
 Input: {"vendor_name": "OldStack", "product": "LegacyCRM", "cost": 4000, "intended_use": "Store internal sales records", "data_type": "internal"}
 ====================================================================================================
-THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-09-outdated-evidence-unrefreshable (OldStack / LegacyCRM).
+THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-09-outdated-evidence-unrefreshable (OldStack / LegacyCRM).
+  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 12s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
   ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "OldStack", "product": "LegacyCRM", "route": "primary"}
   OBSERVE step=1 tool=lookup_vendor_risk outcome=success -> {"outcome": "success", "route": "primary", "attempt": 1, "source_id": "RISK-004", "source_type": "internal_vendor_risk_database", "authority_tier": 2, "status": "approved", "risk_rating": "low", "assessment_date": "2025-10-01", "is_current": false, "days_since_assessment": 304}

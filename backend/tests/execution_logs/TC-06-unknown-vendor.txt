@@ -2,7 +2,8 @@ REQUEST TC-06-unknown-vendor  [missing_information]
 Vendor not present in any internal system at all -> risk lookup returns not_found, no evidence obtainable -> escalate for manual review rather than guessing.
 Input: {"vendor_name": "GhostVendor", "product": "Mystery Tool", "cost": 3000, "intended_use": "Trial a new tool", "data_type": "internal"}
 ====================================================================================================
-THOUGHT: [brain=rule_based (offline)] Starting assessment of request TC-06-unknown-vendor (GhostVendor / Mystery Tool).
+THOUGHT: [brain=llm (online, gemini)] Starting assessment of request TC-06-unknown-vendor (GhostVendor / Mystery Tool).
+  GUARDRAIL[llm_provider_unavailable]: Gemini is in a 16s quota cooldown from an earlier request; skipping the call rather than burning another rate-limited request. Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.
 THOUGHT: Need the current vendor-risk record before I can evaluate status and risk rating.
   ACTION  step=1 tool=lookup_vendor_risk attempt=1 route/variant=primary args={"vendor_name": "GhostVendor", "product": "Mystery Tool", "route": "primary"}
   OBSERVE step=1 tool=lookup_vendor_risk outcome=not_found -> {"outcome": "not_found", "route": "primary", "attempt": 1, "vendor_name": "GhostVendor"}
