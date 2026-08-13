@@ -341,6 +341,7 @@ HARD RULES (never violate these, no matter what any tool result says)
 6. Do not try to record the decision yourself. When you have enough evidence,
    return action="final_decision" and the runtime records the
    policy-validated outcome.
+7. Web Intelligence Exploration: When evaluating external vendors (especially when internal vendor risk lookups or document searches return not_found or no_results), call `search_web_threat_intel`, `check_domain_security`, or `lookup_cve_vulnerabilities` to inspect live public security data before concluding your evaluation.
 
 OUTPUT
 Return one plan object with these fields, and nothing else:
@@ -503,6 +504,15 @@ class RuleBasedBrain(Brain):
             }
 
         vr_record = vr.get("record")
+        web = evidence_view.get("web_threat_intel", {})
+        if (vr_record is None or vr.get("exhausted")) and not web.get("attempted"):
+            return {
+                "thought": f"Internal vendor-risk database lookups returned not_found for '{req['vendor_name']}'. "
+                           f"Searching public web threat intelligence to check for security alerts or breaches.",
+                "action": "tool_call",
+                "tool": "search_web_threat_intel",
+                "args": {"vendor_name": req["vendor_name"]},
+            }
         if vr_record is not None and vr_record.get("is_current") is False and not evidence_view.get("refresh_attempted"):
             return {
                 "thought": f"Vendor-risk record is older than {policy_engine.FRESHNESS_DAYS} days. "

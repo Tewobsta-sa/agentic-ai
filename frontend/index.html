@@ -442,14 +442,17 @@ function renderTraceEntry(entry, delayMs){
   if(entry.type === 'thought'){
     body.textContent = entry.text;
   } else if(entry.type === 'action'){
-    body.innerHTML = `<span class="tool-name">${entry.tool}</span>(${Object.entries(entry.args||{}).map(([k,v])=>`${k}=${JSON.stringify(v)}`).join(', ')})`
+    const isWeb = ['search_web_threat_intel', 'lookup_cve_vulnerabilities', 'check_domain_security'].includes(entry.tool);
+    const badge = isWeb ? '<span style="font-family:var(--mono); font-size:10px; background:#E0F2FE; color:#0369A1; padding:2px 6px; border-radius:3px; font-weight:600; margin-right:4px;">🌐 Live Web Tool</span>' : '<span style="font-family:var(--mono); font-size:10px; background:#F3F4F6; color:#374151; padding:2px 6px; border-radius:3px; font-weight:600; margin-right:4px;">📁 Internal DB</span>';
+    body.innerHTML = `${badge}<span class="tool-name">${entry.tool}</span>(${Object.entries(entry.args||{}).map(([k,v])=>`${k}=${JSON.stringify(v)}`).join(', ')})`
       + `<div class="meta">attempt ${entry.attempt} · route/variant: ${entry.route_or_variant}</div>`;
   } else if(entry.type === 'observation'){
     const outcome = entry.outcome;
     let summary = outcome;
     if(entry.observation && typeof entry.observation === 'object'){
       const o = entry.observation;
-      if(o.risk_rating) summary += ` — risk: ${o.risk_rating}, current: ${o.is_current}`;
+      if(o.summary) summary += ` — ${o.summary}`;
+      else if(o.risk_rating) summary += ` — risk: ${o.risk_rating}, current: ${o.is_current}`;
       else if(o.documents) summary += ` — ${o.documents.length} document(s)`;
       else if(o.result) summary += ` — result: ${o.result}`;
     }

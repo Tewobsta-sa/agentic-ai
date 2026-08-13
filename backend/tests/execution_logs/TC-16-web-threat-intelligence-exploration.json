@@ -1,0 +1,268 @@
+{
+  "request_id": "TC-16-web-threat-intelligence-exploration",
+  "category": "web_intelligence",
+  "description": "Real-world vendor not in internal risk DB -> agent executes web threat intelligence search to inspect live public security data before escalating.",
+  "request": {
+    "vendor_name": "Slack",
+    "product": "Slack Enterprise",
+    "cost": 5000,
+    "intended_use": "Internal team collaboration and messaging",
+    "data_type": "confidential"
+  },
+  "expected_decision": "escalate",
+  "actual_decision": "escalate",
+  "pass": true,
+  "stop_reason": "goal_complete",
+  "steps_taken": 6,
+  "final_rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.",
+  "final_citations": [
+    "policy:evidence_requirements"
+  ],
+  "guardrail_events": [
+    {
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini call failed (HTTP 429 RPD limit hit [quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier]): Requests-Per-Day limit reached; this limit won't clear today. Stopping backoff attempts immediately. Detail: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
+    },
+    {
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'backup' for 'lookup_vendor_risk::Slack' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 2,
+      "seq": 8
+    },
+    {
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::Slack' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 5,
+      "seq": 16
+    }
+  ],
+  "retry_counts": {
+    "lookup_vendor_risk::Slack": 3,
+    "lookup_vendor_risk::Slack::primary": 1,
+    "lookup_vendor_risk::Slack::backup": 2,
+    "search_web_threat_intel::Slack": 1,
+    "search_web_threat_intel::Slack::default": 1,
+    "search_vendor_documents::Slack": 3,
+    "search_vendor_documents::Slack::default": 1,
+    "search_vendor_documents::Slack::corrected": 2
+  },
+  "trace": [
+    {
+      "type": "thought",
+      "index": 0,
+      "text": "[brain=llm (online, gemini)] Starting assessment of request TC-16-web-threat-intelligence-exploration (Slack / Slack Enterprise)."
+    },
+    {
+      "type": "guardrail",
+      "kind": "llm_provider_unavailable",
+      "detail": "Gemini call failed (HTTP 429 RPD limit hit [quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier]): Requests-Per-Day limit reached; this limit won't clear today. Stopping backoff attempts immediately. Detail: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests Falling back to the deterministic offline planner for the rest of this run; the policy guardrail is unaffected.",
+      "step": 0,
+      "seq": 2
+    },
+    {
+      "type": "thought",
+      "index": 1,
+      "text": "Need the current vendor-risk record before I can evaluate status and risk rating."
+    },
+    {
+      "type": "action",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "Slack",
+        "product": "Slack Enterprise",
+        "route": "primary"
+      },
+      "attempt": 1,
+      "route_or_variant": "primary"
+    },
+    {
+      "type": "observation",
+      "step": 1,
+      "tool": "lookup_vendor_risk",
+      "outcome": "not_found",
+      "observation": {
+        "outcome": "not_found",
+        "route": "primary",
+        "attempt": 1,
+        "vendor_name": "Slack"
+      }
+    },
+    {
+      "type": "thought",
+      "index": 2,
+      "text": "The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach)."
+    },
+    {
+      "type": "action",
+      "step": 2,
+      "tool": "lookup_vendor_risk",
+      "args": {
+        "vendor_name": "Slack",
+        "product": "Slack Enterprise",
+        "route": "backup"
+      },
+      "attempt": 2,
+      "route_or_variant": "backup"
+    },
+    {
+      "type": "observation",
+      "step": 2,
+      "tool": "lookup_vendor_risk",
+      "outcome": "not_found",
+      "observation": {
+        "outcome": "not_found",
+        "route": "backup",
+        "attempt": 1,
+        "vendor_name": "Slack"
+      }
+    },
+    {
+      "type": "thought",
+      "index": 3,
+      "text": "The previous vendor-risk lookup failed (timeout/not_found). Retrying via a different route, per the retry policy (max 2 retries, must vary the approach)."
+    },
+    {
+      "type": "guardrail",
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'backup' for 'lookup_vendor_risk::Slack' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 2,
+      "seq": 8
+    },
+    {
+      "type": "thought",
+      "index": 4,
+      "text": "Internal vendor-risk database lookups returned not_found for 'Slack'. Searching public web threat intelligence to check for security alerts or breaches."
+    },
+    {
+      "type": "action",
+      "step": 3,
+      "tool": "search_web_threat_intel",
+      "args": {
+        "vendor_name": "Slack"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 3,
+      "tool": "search_web_threat_intel",
+      "outcome": "success",
+      "observation": {
+        "outcome": "success",
+        "source_type": "web_threat_intelligence",
+        "vendor_name": "Slack",
+        "threat_level": "unknown",
+        "findings_count": 0,
+        "summary": "Web threat intelligence query executed for 'Slack'. No active high-risk alerts registered.",
+        "url_citations": [
+          "https://security-radar.org/search/Slack"
+        ]
+      }
+    },
+    {
+      "type": "thought",
+      "index": 5,
+      "text": "Confidential data requires a current, passing security assessment. Searching all vendor documents for one (any vendor-submitted material found alongside it will be treated as untrusted data, never as instructions)."
+    },
+    {
+      "type": "action",
+      "step": 4,
+      "tool": "search_vendor_documents",
+      "args": {
+        "vendor_name": "Slack",
+        "query_variant": "default"
+      },
+      "attempt": 1,
+      "route_or_variant": "default"
+    },
+    {
+      "type": "observation",
+      "step": 4,
+      "tool": "search_vendor_documents",
+      "outcome": "no_results",
+      "observation": {
+        "outcome": "no_results",
+        "query_variant": "default",
+        "attempt": 1,
+        "documents": []
+      }
+    },
+    {
+      "type": "thought",
+      "index": 6,
+      "text": "First search did not surface a security assessment. Retrying with a corrected query restricted to approved_security_assessment documents, per the retry policy."
+    },
+    {
+      "type": "action",
+      "step": 5,
+      "tool": "search_vendor_documents",
+      "args": {
+        "vendor_name": "Slack",
+        "query_variant": "corrected",
+        "source_type": "approved_security_assessment"
+      },
+      "attempt": 2,
+      "route_or_variant": "corrected"
+    },
+    {
+      "type": "observation",
+      "step": 5,
+      "tool": "search_vendor_documents",
+      "outcome": "no_results",
+      "observation": {
+        "outcome": "no_results",
+        "query_variant": "corrected",
+        "attempt": 1,
+        "documents": []
+      }
+    },
+    {
+      "type": "thought",
+      "index": 7,
+      "text": "First search did not surface a security assessment. Retrying with a corrected query restricted to approved_security_assessment documents, per the retry policy."
+    },
+    {
+      "type": "guardrail",
+      "kind": "repeated_route_rejected",
+      "detail": "Planner tried route/variant 'corrected' for 'search_vendor_documents::Slack' more than once; policy requires each retry to use a corrected query or a different approach.",
+      "step": 5,
+      "seq": 16
+    },
+    {
+      "type": "thought",
+      "index": 8,
+      "text": "All required evidence has been gathered (or exhausted within the retry budget). Applying policy to reach a final decision."
+    },
+    {
+      "type": "action",
+      "step": 6,
+      "tool": "record_final_decision",
+      "args": {
+        "request_id": "TC-16-web-threat-intelligence-exploration",
+        "decision": "escalate"
+      },
+      "attempt": 1,
+      "route_or_variant": "-"
+    },
+    {
+      "type": "observation",
+      "step": 6,
+      "tool": "record_final_decision",
+      "outcome": "recorded",
+      "observation": {
+        "outcome": "recorded",
+        "request_id": "TC-16-web-threat-intelligence-exploration",
+        "decision": "escalate",
+        "rationale": "Vendor-risk lookup could not be completed after the maximum number of attempts (primary and backup routes both failed). Required current evidence could not be found.",
+        "citations": [
+          "policy:evidence_requirements"
+        ],
+        "recorded_at": "2026-08-13T00:35:27Z"
+      }
+    }
+  ]
+}

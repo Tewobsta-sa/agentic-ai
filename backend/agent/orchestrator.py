@@ -133,6 +133,12 @@ def _needs_key(tool_name: str, args: Dict[str, Any]) -> str:
         return f"retrieve_policy::{args.get('section') or 'all'}"
     if tool_name == "calculate_days_since":
         return f"calculate_days_since::{args.get('date_str')}::{args.get('reference_date') or 'default'}"
+    if tool_name == "search_web_threat_intel":
+        return f"search_web_threat_intel::{args.get('vendor_name')}"
+    if tool_name == "lookup_cve_vulnerabilities":
+        return f"lookup_cve_vulnerabilities::{args.get('vendor_name')}"
+    if tool_name == "check_domain_security":
+        return f"check_domain_security::{args.get('domain_or_vendor')}"
     return tool_name
 
 
@@ -175,6 +181,12 @@ def _build_evidence_view(state: AgentState) -> Dict[str, Any]:
         "attempted": sec_attempts > 0,
         "exhausted": sec_attempts >= tools.MAX_ATTEMPTS_PER_NEED and sec_record is None,
         "record": sec_record,
+    }
+
+    web_intel_evidence = state.evidence_by_fact("web_threat_intelligence")
+    view["web_threat_intel"] = {
+        "attempted": len(web_intel_evidence) > 0,
+        "record": web_intel_evidence[-1].value if web_intel_evidence else None,
     }
 
     # Conflict detection: two current tier-2 sources disagreeing on risk_rating
@@ -388,6 +400,33 @@ def _execute_tool(tool_name: str, args: Dict[str, Any], attempt: int, state: Age
     if tool_name == "calculate_days_since":
         obs = tools.calculate_days_since(args["date_str"], args.get("reference_date", eval_date))
         return obs, None
+
+    if tool_name == "search_web_threat_intel":
+        obs = tools.search_web_threat_intel(vendor_name=args["vendor_name"])
+        ev = EvidenceRecord(
+            fact="web_threat_intelligence", source_id=f"WEB-{args['vendor_name']}",
+            source_type=obs.get("source_type", "web_threat_intelligence"), authority_tier=3,
+            document_date=eval_date, is_current=True, value=obs, collected_at_step=state.step_count + 1,
+        )
+        return obs, ev
+
+    if tool_name == "lookup_cve_vulnerabilities":
+        obs = tools.lookup_cve_vulnerabilities(vendor_name=args["vendor_name"], product=args.get("product"))
+        ev = EvidenceRecord(
+            fact="cve_vulnerabilities", source_id=f"CVE-{args['vendor_name']}",
+            source_type=obs.get("source_type", "cve_vulnerability_database"), authority_tier=3,
+            document_date=eval_date, is_current=True, value=obs, collected_at_step=state.step_count + 1,
+        )
+        return obs, ev
+
+    if tool_name == "check_domain_security":
+        obs = tools.check_domain_security(domain_or_vendor=args["domain_or_vendor"])
+        ev = EvidenceRecord(
+            fact="domain_security", source_id=f"DOM-{args['domain_or_vendor']}",
+            source_type=obs.get("source_type", "domain_security_check"), authority_tier=3,
+            document_date=eval_date, is_current=True, value=obs, collected_at_step=state.step_count + 1,
+        )
+        return obs, ev
 
     # No record_final_decision branch on purpose. It is not planner-callable
     # (tools.TOOL_SPECS marks it runtime-only, and _validate_tool_call rejects
