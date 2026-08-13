@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Ledger — Vendor Assessment Agent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#EEF1F4;
@@ -24,17 +24,18 @@
     --escalate-bg:#F7EFDC;
     --info:#3B5B85;
     --info-bg:#E8EEF6;
-    --mono: 'IBM Plex Mono', ui-monospace, monospace;
-    --serif: 'Fraunces', Georgia, serif;
-    --sans: 'Inter', -apple-system, sans-serif;
-    --radius: 3px;
+    --mono: 'Fira Code', ui-monospace, monospace;
+    --serif: 'Outfit', sans-serif;
+    --sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --radius: 6px;
     --shadow: 0 1px 2px rgba(20,25,32,0.06), 0 1px 1px rgba(20,25,32,0.04);
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
     margin:0; background:var(--paper); color:var(--ink);
-    font-family:var(--sans); font-size:15px; line-height:1.5;
+    font-family:var(--sans); font-size:14.5px; line-height:1.6;
+    letter-spacing: -0.01em;
     background-image:
       linear-gradient(var(--line-soft) 1px, transparent 1px);
     background-size: 100% 32px;
@@ -54,18 +55,19 @@
   }
   .brand{display:flex; align-items:baseline; gap:10px;}
   .brand .mark{
-    font-family:var(--serif); font-weight:700; font-size:22px; letter-spacing:-0.01em;
+    font-family:var(--serif); font-weight:800; font-size:23px; letter-spacing:-0.02em;
   }
-  .brand .sub{font-family:var(--mono); font-size:11px; color:var(--ink-soft); letter-spacing:0.06em; text-transform:uppercase;}
+  .brand .sub{font-family:var(--mono); font-size:11px; color:var(--ink-soft); letter-spacing:0.08em; text-transform:uppercase;}
   nav.tabs{display:flex; gap:2px; background:var(--paper-card); border:1px solid var(--line); border-radius:var(--radius); padding:2px;}
   nav.tabs button{
-    font-family:var(--mono); font-size:12px; letter-spacing:0.03em; text-transform:uppercase;
-    padding:7px 14px; border:none; background:transparent; color:var(--ink-soft); cursor:pointer; border-radius:2px;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; font-weight:500;
+    padding:7px 14px; border:none; background:transparent; color:var(--ink-soft); cursor:pointer; border-radius:4px;
+    transition: all 0.15s ease;
   }
-  nav.tabs button.active{background:var(--ink); color:#fff;}
+  nav.tabs button.active{background:var(--ink); color:#fff; font-weight:600;}
   .brain-pill{
     font-family:var(--mono); font-size:11px; color:var(--ink-soft);
-    border:1px dashed var(--line); padding:4px 8px; border-radius:20px; display:flex; align-items:center; gap:6px;
+    border:1px dashed var(--line); padding:4px 10px; border-radius:20px; display:flex; align-items:center; gap:6px;
   }
   .brain-pill .dot{width:6px;height:6px;border-radius:50%;background:#9AA4B2;}
   .brain-pill.live .dot{background:var(--approve);}
@@ -76,8 +78,8 @@
   @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
 
   .hero{margin-bottom:28px;}
-  .hero .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent);}
-  .hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(28px,4vw,40px); margin:6px 0 8px; letter-spacing:-0.01em;}
+  .hero .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); font-weight:600;}
+  .hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(28px,4vw,40px); margin:6px 0 8px; letter-spacing:-0.02em;}
   .hero p{color:var(--ink-soft); max-width:60ch; margin:0;}
 
   .grid{display:grid; grid-template-columns: 380px 1fr; gap:24px; align-items:start;}
@@ -90,21 +92,39 @@
     padding:14px 18px; border-bottom:1px solid var(--line-soft);
     display:flex; align-items:center; justify-content:space-between;
   }
-  .card > .card-head h2{font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; margin:0; color:var(--ink-soft);}
+  .card > .card-head h2{font-family:var(--mono); font-size:11.5px; text-transform:uppercase; letter-spacing:0.1em; margin:0; color:var(--ink-soft); font-weight:600;}
   .card-body{padding:18px;}
 
   form .field{margin-bottom:14px;}
-  form label{display:block; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); margin-bottom:6px;}
+  form label{display:block; font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:6px; font-weight:600;}
   form input, form select, form textarea{
-    width:100%; font-family:var(--sans); font-size:14px; padding:9px 10px;
-    border:1px solid var(--line); border-radius:2px; background:#fff; color:var(--ink);
+    width:100%; font-family:var(--sans); font-size:13.5px; padding:10px 12px;
+    border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--ink);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  form select, .scenario-picker select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%204B5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-weight: 500;
+  }
+  form select:hover, .scenario-picker select:hover {
+    border-color: var(--ink-soft);
   }
   form textarea{resize:vertical; min-height:56px;}
-  form input:focus, form select:focus, form textarea:focus{border-color:var(--accent);}
+  form input:focus, form select:focus, form textarea:focus{
+    outline:none; border-color:var(--ink); box-shadow: 0 0 0 2px rgba(22, 27, 34, 0.08);
+  }
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
 
   .scenario-picker{margin-bottom:18px; padding-bottom:16px; border-bottom:1px dashed var(--line);}
-  .scenario-picker select{margin-bottom:6px;}
+  .scenario-picker select{margin-bottom:6px; width: 100%; font-size:13px; font-family:var(--sans); padding: 9px 12px; border-radius:6px; border:1px solid var(--line);}
   .scenario-picker .hint{font-size:12px; color:var(--ink-soft);}
 
   button.primary{
